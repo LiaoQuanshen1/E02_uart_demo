@@ -147,3 +147,23 @@ Listings/
 *.elf
 *.hex
 *.out
+
+# ==============================
+# CMSIS Build (CSolution) 生成文件
+# ==============================
+*.cbuild-idx.yml
+*.cbuild-pack.yml
+*.cbuild-run.yml
+uv2csolution.log
+
+# CMSIS 构建临时目录
+mdk/tmp/
+mdk/out/
+
+# ==============================
+# IDE / 编辑器设置（用户相关）
+# ==============================
+.vscode/
+.clangd
+.clangd/
+mdk/MDK删除临时文件.bat

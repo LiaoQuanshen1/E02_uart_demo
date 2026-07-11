@@ -1,0 +1,10 @@
+solution:
+  created-by: uv2csolution@1.6.0
+  created-for: CMSIS-Toolbox@2.7.0
+  compiler: AC6
+  target-types:
+    - type: mm32f327x_g8p_project
+      device: MM32F3273G8P
+      optimize: debug
+  projects:
+    - project: mm32f327x_g8p.cproject.yml

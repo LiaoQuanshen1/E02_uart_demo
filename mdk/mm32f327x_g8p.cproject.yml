@@ -1,0 +1,243 @@
+project:
+  packs:
+    - pack: MindMotion::MM32F3270_DFP@^1.0.6
+  setups:
+    - setup: Options for mm32f327x_g8p_project
+      add-path:
+        - ../user/inc
+        - ../code
+        - ../../libraries/zf_common
+        - ../../libraries/zf_device
+        - ../../libraries/zf_driver
+        - ../../libraries/sdk
+        - ../../libraries/sdk/CMSIS/Include
+        - ../../libraries/sdk/drivers
+        - ../../libraries/components/fatfs/source
+      debug: "on"
+      define:
+        - __MICROLIB
+      define-asm:
+        - __MICROLIB
+      misc:
+        - C:
+            - -std=c99
+          C-CPP:
+            - -fno-rtti
+            - -fsigned-char
+            - -fshort-enums
+            - -fshort-wchar
+            - -ffunction-sections
+            - -Wno-packed
+            - -Wno-missing-variable-declarations
+            - -Wno-missing-prototypes
+            - -Wno-missing-noreturn
+            - -Wno-sign-conversion
+            - -Wno-nonportable-include-path
+            - -Wno-reserved-id-macro
+            - -Wno-unused-macros
+            - -Wno-documentation-unknown-command
+            - -Wno-documentation
+            - -Wno-license-management
+            - -Wno-parentheses-equality
+          CPP:
+            - -xc++
+            - -std=c++11
+            - -fno-exceptions
+          ASM:
+            - -masm=auto
+          Link:
+            - --library_type=microlib
+            - --map
+            - --load_addr_map_info
+            - --xref
+            - --callgraph
+            - --symbols
+            - --info sizes
+            - --info totals
+            - --info unused
+            - --info veneers
+            - --strict
+            - --summary_stderr
+            - --info summarysizes
+  linker:
+    - script: ../../libraries/sdk/mdk/linker/mm32f3277g_flash.scf
+  groups:
+    - group: user_c
+      files:
+        - file: ../user/src/main.c
+        - file: ../user/src/isr.c
+    - group: user_h
+      files:
+        - file: ../user/inc/isr.h
+    - group: doc
+      files:
+        - file: ../../libraries/doc/version.txt
+    - group: zf_common
+      files:
+        - file: ../../libraries/zf_common/zf_common_clock.c
+        - file: ../../libraries/zf_common/zf_common_clock.h
+        - file: ../../libraries/zf_common/zf_common_debug.c
+        - file: ../../libraries/zf_common/zf_common_debug.h
+        - file: ../../libraries/zf_common/zf_common_fifo.c
+        - file: ../../libraries/zf_common/zf_common_fifo.h
+        - file: ../../libraries/zf_common/zf_common_font.c
+        - file: ../../libraries/zf_common/zf_common_font.h
+        - file: ../../libraries/zf_common/zf_common_function.c
+        - file: ../../libraries/zf_common/zf_common_function.h
+        - file: ../../libraries/zf_common/zf_common_interrupt.c
+        - file: ../../libraries/zf_common/zf_common_interrupt.h
+        - file: ../../libraries/zf_common/zf_common_headfile.h
+        - file: ../../libraries/zf_common/zf_common_typedef.h
+    - group: zf_driver
+      files:
+        - file: ../../libraries/zf_driver/zf_driver_adc.c
+        - file: ../../libraries/zf_driver/zf_driver_adc.h
+        - file: ../../libraries/zf_driver/zf_driver_dac.c
+        - file: ../../libraries/zf_driver/zf_driver_dac.h
+        - file: ../../libraries/zf_driver/zf_driver_delay.c
+        - file: ../../libraries/zf_driver/zf_driver_delay.h
+        - file: ../../libraries/zf_driver/zf_driver_dma.c
+        - file: ../../libraries/zf_driver/zf_driver_dma.h
+        - file: ../../libraries/zf_driver/zf_driver_encoder.c
+        - file: ../../libraries/zf_driver/zf_driver_encoder.h
+        - file: ../../libraries/zf_driver/zf_driver_exti.c
+        - file: ../../libraries/zf_driver/zf_driver_exti.h
+        - file: ../../libraries/zf_driver/zf_driver_flash.c
+        - file: ../../libraries/zf_driver/zf_driver_flash.h
+        - file: ../../libraries/zf_driver/zf_driver_gpio.c
+        - file: ../../libraries/zf_driver/zf_driver_gpio.h
+        - file: ../../libraries/zf_driver/zf_driver_iic.c
+        - file: ../../libraries/zf_driver/zf_driver_iic.h
+        - file: ../../libraries/zf_driver/zf_driver_pit.c
+        - file: ../../libraries/zf_driver/zf_driver_pit.h
+        - file: ../../libraries/zf_driver/zf_driver_pwm.c
+        - file: ../../libraries/zf_driver/zf_driver_pwm.h
+        - file: ../../libraries/zf_driver/zf_driver_sdio.c
+        - file: ../../libraries/zf_driver/zf_driver_sdio.h
+        - file: ../../libraries/zf_driver/zf_driver_soft_iic.c
+        - file: ../../libraries/zf_driver/zf_driver_soft_iic.h
+        - file: ../../libraries/zf_driver/zf_driver_soft_spi.c
+        - file: ../../libraries/zf_driver/zf_driver_soft_spi.h
+        - file: ../../libraries/zf_driver/zf_driver_spi.c
+        - file: ../../libraries/zf_driver/zf_driver_spi.h
+        - file: ../../libraries/zf_driver/zf_driver_timer.c
+        - file: ../../libraries/zf_driver/zf_driver_timer.h
+        - file: ../../libraries/zf_driver/zf_driver_uart.c
+        - file: ../../libraries/zf_driver/zf_driver_uart.h
+    - group: zf_device
+      files:
+        - file: ../../libraries/zf_device/zf_device_absolute_encoder.c
+        - file: ../../libraries/zf_device/zf_device_absolute_encoder.h
+        - file: ../../libraries/zf_device/zf_device_bluetooth_ch9141.c
+        - file: ../../libraries/zf_device/zf_device_bluetooth_ch9141.h
+        - file: ../../libraries/zf_device/zf_device_camera.c
+        - file: ../../libraries/zf_device/zf_device_camera.h
+        - file: ../../libraries/zf_device/zf_device_config.h
+        - file: ../../libraries/zf_device/zf_device_config.lib
+        - file: ../../libraries/zf_device/zf_device_dl1a.c
+        - file: ../../libraries/zf_device/zf_device_dl1a.h
+        - file: ../../libraries/zf_device/zf_device_dm1xa.c
+        - file: ../../libraries/zf_device/zf_device_dm1xa.h
+        - file: ../../libraries/zf_device/zf_device_gps_tau1201.c
+        - file: ../../libraries/zf_device/zf_device_gps_tau1201.h
+        - file: ../../libraries/zf_device/zf_device_icm20602.c
+        - file: ../../libraries/zf_device/zf_device_icm20602.h
+        - file: ../../libraries/zf_device/zf_device_imu660ra.c
+        - file: ../../libraries/zf_device/zf_device_imu660ra.h
+        - file: ../../libraries/zf_device/zf_device_imu963ra.c
+        - file: ../../libraries/zf_device/zf_device_imu963ra.h
+        - file: ../../libraries/zf_device/zf_device_ips114.c
+        - file: ../../libraries/zf_device/zf_device_ips114.h
+        - file: ../../libraries/zf_device/zf_device_ips200.c
+        - file: ../../libraries/zf_device/zf_device_ips200.h
+        - file: ../../libraries/zf_device/zf_device_key.c
+        - file: ../../libraries/zf_device/zf_device_key.h
+        - file: ../../libraries/zf_device/zf_device_mpu6050.c
+        - file: ../../libraries/zf_device/zf_device_mpu6050.h
+        - file: ../../libraries/zf_device/zf_device_mt9v03x.c
+        - file: ../../libraries/zf_device/zf_device_mt9v03x.h
+        - file: ../../libraries/zf_device/zf_device_oled.c
+        - file: ../../libraries/zf_device/zf_device_oled.h
+        - file: ../../libraries/zf_device/zf_device_ov7725.c
+        - file: ../../libraries/zf_device/zf_device_ov7725.h
+        - file: ../../libraries/zf_device/zf_device_scc8660.c
+        - file: ../../libraries/zf_device/zf_device_scc8660.h
+        - file: ../../libraries/zf_device/zf_device_sdcard.c
+        - file: ../../libraries/zf_device/zf_device_sdcard.h
+        - file: ../../libraries/zf_device/zf_device_tft180.c
+        - file: ../../libraries/zf_device/zf_device_tft180.h
+        - file: ../../libraries/zf_device/zf_device_tsl1401.c
+        - file: ../../libraries/zf_device/zf_device_tsl1401.h
+        - file: ../../libraries/zf_device/zf_device_type.c
+        - file: ../../libraries/zf_device/zf_device_type.h
+        - file: ../../libraries/zf_device/zf_device_virtual_oscilloscope.c
+        - file: ../../libraries/zf_device/zf_device_virtual_oscilloscope.h
+        - file: ../../libraries/zf_device/zf_device_wifi_uart.c
+        - file: ../../libraries/zf_device/zf_device_wifi_uart.h
+        - file: ../../libraries/zf_device/zf_device_wireless_uart.c
+        - file: ../../libraries/zf_device/zf_device_wireless_uart.h
+    - group: sdk
+      files:
+        - file: ../../libraries/sdk/hal_device_registers.h
+        - file: ../../libraries/sdk/mm32f3277g.h
+        - file: ../../libraries/sdk/mm32f3277g_features.h
+        - file: ../../libraries/sdk/system_mm32f3277g.c
+        - file: ../../libraries/sdk/system_mm32f3277g.h
+        - file: ../../libraries/sdk/mdk/startup_mm32f3277g.s
+          misc:
+            - ASM:
+                - -masm=auto
+        - file: ../../libraries/sdk/drivers/hal_adc.c
+        - file: ../../libraries/sdk/drivers/hal_adc.h
+        - file: ../../libraries/sdk/drivers/hal_common.h
+        - file: ../../libraries/sdk/drivers/hal_comp.c
+        - file: ../../libraries/sdk/drivers/hal_comp.h
+        - file: ../../libraries/sdk/drivers/hal_dac.c
+        - file: ../../libraries/sdk/drivers/hal_dac.h
+        - file: ../../libraries/sdk/drivers/hal_dma.c
+        - file: ../../libraries/sdk/drivers/hal_dma.h
+        - file: ../../libraries/sdk/drivers/hal_dma_request.h
+        - file: ../../libraries/sdk/drivers/hal_exti.c
+        - file: ../../libraries/sdk/drivers/hal_exti.h
+        - file: ../../libraries/sdk/drivers/hal_fsmc.c
+        - file: ../../libraries/sdk/drivers/hal_fsmc.h
+        - file: ../../libraries/sdk/drivers/hal_gpio.c
+        - file: ../../libraries/sdk/drivers/hal_gpio.h
+        - file: ../../libraries/sdk/drivers/hal_i2c.c
+        - file: ../../libraries/sdk/drivers/hal_i2c.h
+        - file: ../../libraries/sdk/drivers/hal_iwdg.c
+        - file: ../../libraries/sdk/drivers/hal_iwdg.h
+        - file: ../../libraries/sdk/drivers/hal_rcc.c
+        - file: ../../libraries/sdk/drivers/hal_rcc.h
+        - file: ../../libraries/sdk/drivers/hal_rtc.c
+        - file: ../../libraries/sdk/drivers/hal_rtc.h
+        - file: ../../libraries/sdk/drivers/hal_sdio.c
+        - file: ../../libraries/sdk/drivers/hal_sdio.h
+        - file: ../../libraries/sdk/drivers/hal_spi.c
+        - file: ../../libraries/sdk/drivers/hal_spi.h
+        - file: ../../libraries/sdk/drivers/hal_syscfg.c
+        - file: ../../libraries/sdk/drivers/hal_syscfg.h
+        - file: ../../libraries/sdk/drivers/hal_tim_16b.c
+        - file: ../../libraries/sdk/drivers/hal_tim_16b.h
+        - file: ../../libraries/sdk/drivers/hal_tim_32b.c
+        - file: ../../libraries/sdk/drivers/hal_tim_32b.h
+        - file: ../../libraries/sdk/drivers/hal_tim_adv.c
+        - file: ../../libraries/sdk/drivers/hal_tim_adv.h
+        - file: ../../libraries/sdk/drivers/hal_tim_basic.c
+        - file: ../../libraries/sdk/drivers/hal_tim_basic.h
+        - file: ../../libraries/sdk/drivers/hal_uart.c
+        - file: ../../libraries/sdk/drivers/hal_uart.h
+        - file: ../../libraries/sdk/drivers/hal_usb.c
+        - file: ../../libraries/sdk/drivers/hal_usb.h
+        - file: ../../libraries/sdk/drivers/hal_usb_bdt.h
+        - file: ../../libraries/sdk/drivers/hal_wwdg.c
+        - file: ../../libraries/sdk/drivers/hal_wwdg.h
+    - group: components_fatfs
+      files:
+        - file: ../../libraries/components/fatfs/source/diskio.c
+        - file: ../../libraries/components/fatfs/source/diskio.h
+        - file: ../../libraries/components/fatfs/source/ff.c
+        - file: ../../libraries/components/fatfs/source/ff.h
+        - file: ../../libraries/components/fatfs/source/ffconf.h
+        - file: ../../libraries/components/fatfs/source/ffsystem.c
+        - file: ../../libraries/components/fatfs/source/ffunicode.c
