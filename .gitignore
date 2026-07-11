@@ -1,0 +1,149 @@
+# ==============================
+# Prerequisites
+# ==============================
+*.d
+
+# ==============================
+# Object files
+# ==============================
+*.o
+*.ko
+*.obj
+*.elf
+
+# ==============================
+# Linker output
+# ==============================
+*.ilk
+*.map
+*.exp
+
+# ==============================
+# Precompiled Headers
+# ==============================
+*.gch
+*.pch
+
+# ==============================
+# Libraries
+# ==============================
+*.la
+*.lo
+
+# ==============================
+# Shared objects (inc. Windows DLLs)
+# ==============================
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# ==============================
+# Executables
+# ==============================
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# ==============================
+# Debug files
+# ==============================
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# ==============================
+# Kernel Module Compile Results
+# ==============================
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# ==============================
+# IAR Embedded Workbench
+# ==============================
+# 调试器配置文件
+iar/program/settings/
+*.cspy.bat
+*.dnx
+*.reggroups
+
+# IAR 编辑器/用户设置
+*.ewt
+
+# IAR 依赖文件
+*.dep
+
+# IAR 编译输出目录
+iar/program/Debug/
+iar/program/Release/
+Debug/
+Release/
+
+# IAR 运行时/临时文件
+*.crun
+*.dbgdt
+*.xcl
+*.ps1
+
+# ==============================
+# MDK (?Vision / Keil)
+# ==============================
+# 用户选项文件（每人不同，不应跟踪）
+*.uvoptx
+
+# UVision GUI 配置文件
+*.uvgui.*
+*.uvgui
+
+# 调试器设置
+JLinkSettings.ini
+JLinkLog.txt
+
+# 编译输出目录
+Objects/
+Listings/
+
+# MDK 中间文件
+*.scvd
+*.bak
+*.ddk
+*.edk
+*.lst
+*.lnp
+*.mpf
+*.mpj
+*.omf
+*.plg
+*.rpt
+*.tmp
+*.__i
+*.crf
+*.axf
+*.tra
+*.iex
+*.htm
+*.sct
+
+# ==============================
+# IDE 临时清理脚本
+# ==============================
+*删除临时文件.bat
+
+# ==============================
+# 通用嵌入式 / 编译器产物
+# ==============================
+*.bin
+*.lss
+*.sym
+*.elf
+*.hex
+*.out
