@@ -2,6 +2,8 @@
 # Prerequisites
 # ==============================
 *.d
+*.html
+*.png
 
 # ==============================
 # Object files
@@ -17,6 +19,10 @@
 *.ilk
 *.map
 *.exp
+*.axf
+*.lnp
+*.lst
+*.dep
 
 # ==============================
 # Precompiled Headers
@@ -46,6 +52,47 @@
 *.app
 *.i*86
 *.x86_64
+
+# ==============================
+# MDK / Keil build outputs
+# ==============================
+mdk/Objects/
+mdk/Listings/
+mdk/tmp/
+mdk/out/
+
+# MDK / Keil user-specific
+mdk/*.uvguix.*
+mdk/*.uvoptx
+mdk/uv2csolution.log
+mdk/JLinkSettings.ini
+
+# cbuild cache
+mdk/*.cbuild-idx.yml
+mdk/*.cbuild-pack.yml
+
+# clangd index
+mdk/.clangd
+
+# ==============================
+# IAR build outputs
+# ==============================
+iar/program/settings/
+iar/program/*.dep
+
+# IAR user-specific
+iar/program/*.ewd
+iar/program/*.ewt
+
+# ==============================
+# CMake / Ninja (cbuild tmp)
+# ==============================
+build.ninja
+*.ninja_log
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+roots.cmake
 *.hex
 
 # ==============================
@@ -167,3 +214,7 @@ mdk/out/
 .clangd
 .clangd/
 mdk/MDK删除临时文件.bat
+libraries/版本文件在doc文件夹下.txt
+.gitignore
+libraries/components/fatfs/LICENSE.txt
+.gitignore

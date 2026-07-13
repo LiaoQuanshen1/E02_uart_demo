@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\user\inc;..\code;..\..\libraries\zf_common;..\..\libraries\zf_device;..\..\libraries\zf_driver;..\..\libraries\sdk;..\..\libraries\sdk\CMSIS\Include;..\..\libraries\sdk\drivers;..\..\libraries\components\fatfs\source</IncludePath>
+              <IncludePath>..\user\inc;..\code;..\libraries;..\libraries\zf_common;..\libraries\zf_device;..\libraries\zf_driver;..\libraries\sdk;..\libraries\sdk\CMSIS\Include;..\libraries\sdk\drivers;..\libraries\components\fatfs\source;..\libraries\components\MENU</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -371,7 +371,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\libraries\sdk\mdk\linker\mm32f3277g_flash.scf</ScatterFile>
+            <ScatterFile>..\libraries\sdk\mdk\linker\mm32f3277g_flash.scf</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -410,87 +410,37 @@
           <GroupName>code</GroupName>
         </Group>
         <Group>
-          <GroupName>doc</GroupName>
-          <Files>
-            <File>
-              <FileName>version.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\doc\version.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>zf_common</GroupName>
+          <GroupName>zf_commen</GroupName>
           <Files>
             <File>
               <FileName>zf_common_clock.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_clock.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_clock.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_clock.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_clock.c</FilePath>
             </File>
             <File>
               <FileName>zf_common_debug.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_debug.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_debug.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_debug.c</FilePath>
             </File>
             <File>
               <FileName>zf_common_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_fifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_fifo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_fifo.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_fifo.c</FilePath>
             </File>
             <File>
               <FileName>zf_common_font.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_font.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_font.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_font.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_font.c</FilePath>
             </File>
             <File>
               <FileName>zf_common_function.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_function.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_function.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_function.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_function.c</FilePath>
             </File>
             <File>
               <FileName>zf_common_interrupt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_interrupt.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_interrupt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_interrupt.h</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_headfile.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_headfile.h</FilePath>
-            </File>
-            <File>
-              <FileName>zf_common_typedef.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_common\zf_common_typedef.h</FilePath>
+              <FilePath>..\libraries\zf_common\zf_common_interrupt.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -500,172 +450,102 @@
             <File>
               <FileName>zf_driver_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_adc.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_adc.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_dac.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_dac.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_dac.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_dac.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_dac.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_delay.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_delay.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_dma.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_dma.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_dma.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_encoder.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_encoder.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_encoder.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_encoder.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_exti.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_exti.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_exti.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_flash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_flash.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_flash.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_gpio.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_gpio.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_iic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_iic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_iic.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_iic.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_pit.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_pit.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_pit.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_pit.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_pit.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_pwm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_pwm.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_pwm.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_pwm.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_pwm.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_sdio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_sdio.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_sdio.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_soft_iic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_soft_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_soft_iic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_soft_iic.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_soft_iic.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_soft_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_soft_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_soft_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_soft_spi.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_soft_spi.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_spi.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_spi.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_driver_timer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_timer.h</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_timer.c</FilePath>
             </File>
             <File>
               <FileName>zf_driver_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_uart.c</FilePath>
+              <FilePath>..\libraries\zf_driver\zf_driver_uart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>sdk</GroupName>
+          <Files>
+            <File>
+              <FileName>system_mm32f3277g.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\sdk\system_mm32f3277g.c</FilePath>
             </File>
             <File>
-              <FileName>zf_driver_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_driver\zf_driver_uart.h</FilePath>
+              <FileName>startup_mm32f3277g.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\libraries\sdk\mdk\startup_mm32f3277g.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -675,552 +555,157 @@
             <File>
               <FileName>zf_device_absolute_encoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_absolute_encoder.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_absolute_encoder.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_absolute_encoder.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_absolute_encoder.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_bluetooth_ch9141.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_bluetooth_ch9141.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_bluetooth_ch9141.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_bluetooth_ch9141.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_bluetooth_ch9141.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_camera.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_camera.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_camera.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_camera.h</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_config.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_config.lib</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_camera.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_dl1a.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_dl1a.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_dl1a.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_dl1a.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_dl1a.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_dm1xa.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_dm1xa.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_dm1xa.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_dm1xa.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_dm1xa.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_gps_tau1201.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_gps_tau1201.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_gps_tau1201.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_gps_tau1201.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_gps_tau1201.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_icm20602.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_icm20602.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_icm20602.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_icm20602.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_icm20602.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_imu660ra.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_imu660ra.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_imu660ra.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_imu660ra.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_imu660ra.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_imu963ra.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_imu963ra.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_imu963ra.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_imu963ra.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_imu963ra.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_ips114.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ips114.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_ips114.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ips114.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_ips114.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_ips200.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ips200.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_ips200.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ips200.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_ips200.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_key.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_key.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_key.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_key.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_key.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_mpu6050.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_mpu6050.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_mpu6050.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_mpu6050.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_mpu6050.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_mt9v03x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_mt9v03x.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_mt9v03x.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_mt9v03x.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_mt9v03x.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_oled.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_oled.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_oled.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_oled.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_oled.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_ov7725.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ov7725.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_ov7725.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_ov7725.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_ov7725.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_scc8660.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_scc8660.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_scc8660.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_scc8660.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_scc8660.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_sdcard.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_sdcard.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_sdcard.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_sdcard.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_tft180.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_tft180.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_tft180.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_tft180.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_tft180.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_tsl1401.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_tsl1401.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_tsl1401.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_tsl1401.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_tsl1401.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_type.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_type.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_type.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_type.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_virtual_oscilloscope.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_virtual_oscilloscope.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_virtual_oscilloscope.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_virtual_oscilloscope.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_virtual_oscilloscope.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_wifi_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_wifi_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>zf_device_wifi_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_wifi_uart.h</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_wifi_uart.c</FilePath>
             </File>
             <File>
               <FileName>zf_device_wireless_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_wireless_uart.c</FilePath>
+              <FilePath>..\libraries\zf_device\zf_device_wireless_uart.c</FilePath>
             </File>
             <File>
-              <FileName>zf_device_wireless_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\zf_device\zf_device_wireless_uart.h</FilePath>
+              <FileName>zf_device_config.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\libraries\zf_device\zf_device_config.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>sdk</GroupName>
+          <GroupName>components</GroupName>
           <Files>
             <File>
-              <FileName>hal_device_registers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\hal_device_registers.h</FilePath>
-            </File>
-            <File>
-              <FileName>mm32f3277g.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\mm32f3277g.h</FilePath>
-            </File>
-            <File>
-              <FileName>mm32f3277g_features.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\mm32f3277g_features.h</FilePath>
-            </File>
-            <File>
-              <FileName>system_mm32f3277g.c</FileName>
+              <FileName>zf_components_menu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\system_mm32f3277g.c</FilePath>
+              <FilePath>..\libraries\components\MENU\zf_components_menu.c</FilePath>
             </File>
-            <File>
-              <FileName>system_mm32f3277g.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\system_mm32f3277g.h</FilePath>
-            </File>
-            <File>
-              <FileName>startup_mm32f3277g.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\libraries\sdk\mdk\startup_mm32f3277g.s</FilePath>
-            </File>
-            <File>
-              <FileName>hal_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_adc.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_comp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_comp.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_comp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_comp.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_dac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_dac.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_dac.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_dac.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_dma.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_dma.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_dma_request.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_dma_request.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_exti.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_exti.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_fsmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_fsmc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_fsmc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_fsmc.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_gpio.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_i2c.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_i2c.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_iwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_iwdg.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_iwdg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_iwdg.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_rcc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_rcc.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_rtc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_rtc.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_sdio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_sdio.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_spi.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_syscfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_syscfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_syscfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_syscfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_16b.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_16b.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_16b.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_16b.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_32b.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_32b.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_32b.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_32b.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_adv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_adv.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_adv.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_adv.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_basic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_basic.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tim_basic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_tim_basic.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_uart.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_usb.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_usb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_usb.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_usb_bdt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_usb_bdt.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_wwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_wwdg.c</FilePath>
-            </File>
-            <File>
-              <FileName>hal_wwdg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\sdk\drivers\hal_wwdg.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>components_fatfs</GroupName>
-          <Files>
             <File>
               <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\diskio.h</FilePath>
+              <FilePath>..\libraries\components\fatfs\source\diskio.c</FilePath>
             </File>
             <File>
               <FileName>ff.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\ff.h</FilePath>
-            </File>
-            <File>
-              <FileName>ffconf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\ffconf.h</FilePath>
+              <FilePath>..\libraries\components\fatfs\source\ff.c</FilePath>
             </File>
             <File>
               <FileName>ffsystem.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\ffsystem.c</FilePath>
+              <FilePath>..\libraries\components\fatfs\source\ffsystem.c</FilePath>
             </File>
             <File>
               <FileName>ffunicode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\libraries\components\fatfs\source\ffunicode.c</FilePath>
+              <FilePath>..\libraries\components\fatfs\source\ffunicode.c</FilePath>
             </File>
           </Files>
         </Group>
