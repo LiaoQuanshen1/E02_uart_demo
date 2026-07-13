@@ -10,6 +10,8 @@
 // 电机速度控制参数（百分制输入 → 内部 duty 值换算）
 #define MOTOR_SPEED_MAX     100                                                // 速度输入范围：-100 ~ +100（百分制）
 #define MOTOR_DUTY_SCALE    (PWM_DUTY_MAX / MOTOR_SPEED_MAX)                   // 百分制→duty 换算系数
+#define MOTOR_CLAMP_RATE(r)  ((r) > MOTOR_SPEED_MAX ? MOTOR_SPEED_MAX :        \
+                              (r) < -MOTOR_SPEED_MAX ? -MOTOR_SPEED_MAX : (r)) // 限幅到 [-MAX, +MAX]
 
 void motor_init (void)
 {
@@ -23,6 +25,8 @@ static void motor_set (gpio_pin_enum dir, pwm_channel_enum ch, int16 rate)
 {
     uint16 duty;                                                                // 待写入的占空比（0 ~ PWM_DUTY_MAX）
 
+    rate = MOTOR_CLAMP_RATE(rate);                                              // 限幅到 [-MOTOR_SPEED_MAX, +MOTOR_SPEED_MAX]
+
     if(rate > 0)
     {
         gpio_high(dir);                                                         // 正向：方向引脚输出高电平
@@ -33,7 +37,7 @@ static void motor_set (gpio_pin_enum dir, pwm_channel_enum ch, int16 rate)
     {
         gpio_low(dir);                                                          // 反向：方向引脚输出低电平
         duty = (uint16)(-rate) * MOTOR_DUTY_SCALE;
-        pwm_set_duty(ch, duty);
+        pwm_set_duty(ch, duty);//正转或者反转，自己进行尝试，有可能会后续修改
     }
     else
     {
