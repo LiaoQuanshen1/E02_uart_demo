@@ -72,7 +72,8 @@ project:
         - file: ../user/inc/isr.h
     - group: code
       files:
-        - file: ../code/my_image_show.c          # °˚ º”’‚––  
+        - file: ../code/my_image_show.c
+        - file: ../code/my_motor.c
     - group: zf_common
       files:
         - file: ../libraries/zf_common/zf_common_clock.c

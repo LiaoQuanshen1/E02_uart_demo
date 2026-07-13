@@ -419,6 +419,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\my_image_show.h</FilePath>
             </File>
+            <File>
+              <FileName>my_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\my_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>my_motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\my_motor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
