@@ -70,9 +70,9 @@ project:
     - group: user_h
       files:
         - file: ../user/inc/isr.h
-    - group: doc
+    - group: code
       files:
-        - file: ../libraries/doc/version.txt
+        - file: ../code/my_image_show.c          # °˚ º”’‚––  
     - group: zf_common
       files:
         - file: ../libraries/zf_common/zf_common_clock.c

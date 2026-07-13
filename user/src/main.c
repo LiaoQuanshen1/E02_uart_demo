@@ -1,5 +1,5 @@
 #include "zf_common_headfile.h"
-
+#include "my_image_show.h"
 #define UART_INDEX              (DEBUG_UART_INDEX   )                           // 默认 UART_1
 #define UART_BAUDRATE           (DEBUG_UART_BAUDRATE)                           // 默认 115200
 #define UART_TX_PIN             (DEBUG_UART_TX_PIN  )                           // 默认 UART1_TX_A9
@@ -18,10 +18,13 @@ fifo_struct uart_data_fifo;
 int main (void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
-//    debug_init();                                                               // 初始化默认 debug uart
+    debug_init();                                                               // 初始化默认 debug uart
 
     // 此处编写用户代码 例如外设初始化代码等
     fifo_init(&uart_data_fifo, FIFO_DATA_8BIT, uart_get_data, 64);              // 初始化 fifo 挂载缓冲区
+     mt9v03x_init();
+     ips200_init(IPS200_TYPE_SPI);            // 初始化 IPS200（SPI 模式）
+    ips200_clear();
 
     uart_init(UART_INDEX, UART_BAUDRATE, UART_TX_PIN, UART_RX_PIN);             // 初始化编码器模块与引脚 正交解码编码器模式
     uart_rx_interrupt(UART_INDEX, ZF_ENABLE);                                   // 开启 UART_INDEX 的接收中断
@@ -34,6 +37,7 @@ int main (void)
 
     while(1)
     {
+        image_show();                                                              // 图像采集 + 大津法二值化 + 显示 + 巡线绘制
         // 此处编写需要循环执行的代码
         fifo_data_count = fifo_used(&uart_data_fifo);                           // 查看 fifo 是否有数据
         if(0 != fifo_data_count)                                                // 读取到数据了
