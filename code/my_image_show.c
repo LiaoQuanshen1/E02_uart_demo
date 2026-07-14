@@ -142,7 +142,8 @@ void image_show (void)
     uint8 thresh = otsu_threshold(image_buf);
 
     // ③ 显示二值化图像（必须先于画线，避免线条被覆盖）
-    ips200_clear();
+    // 注意：不再调用 ips200_clear()，因为 ips200_show_gray_image 已通过 set_region 设定显示区域
+    //       并批量 SPI 连续写入，清屏 240×320 像素纯属浪费，是画面卡的元凶
     ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
 
     // ④ 巡线 + 绘制边界和中线
