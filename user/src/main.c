@@ -1,5 +1,4 @@
 #include "zf_common_headfile.h"
-#include "zf_driver_dma.h"
 #include "my_image_show.h"
 #define UART_INDEX              (DEBUG_UART_INDEX   )                           // 默认 UART_1
 #define UART_BAUDRATE           (DEBUG_UART_BAUDRATE)                           // 默认 115200
@@ -35,24 +34,10 @@ int main (void)
     uart_write_byte(UART_INDEX, '\r');                                          // 输出回车
     uart_write_byte(UART_INDEX, '\n');                                          // 输出换行
     // 此处编写用户代码 例如外设初始化代码等
-    static uint8 img_buf[MT9V03X_H][MT9V03X_W];                                  // 本地缓冲，防止 DMA 覆盖
 
     while(1)
     {
-        // 直接显示摄像头原始灰度图像（threshold=0 不做二值化）
-        if(mt9v03x_finish_flag)
-        {
-            // 临界区：关闭场中断 + 关闭 DMA，确保拷贝的是完整一帧
-            interrupt_disable(MT9V03X_VSYNC_IRQN);                              // 禁止场中断，防止 VSYNC 重开 DMA
-            dma_disable(MT9V03X_DMA_CH);                                        // 确保 DMA 完全停止
-            memcpy(img_buf, mt9v03x_image, MT9V03X_IMAGE_SIZE);                 // 拷贝完整一帧到本地缓冲
-            mt9v03x_finish_flag = 0;                                             // 清除标志
-            interrupt_enable(MT9V03X_VSYNC_IRQN);                               // 恢复场中断（DMA 保持关闭，下一帧 VSYNC 会自动重开）
-
-            // 从本地缓冲显示，慢速刷新确保肉眼可见完整帧
-            ips200_show_gray_image(0, 0, (uint8 *)img_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
-            system_delay_ms(50);                                                 // 降低刷新速度，~20fps
-        }
+        image_show();                                                              // 图像采集 + 原始灰度 + 二值化 + 巡线，全部封装在模块内
 
         // 此处编写需要循环执行的代码
         fifo_data_count = fifo_used(&uart_data_fifo);                           // 查看 fifo 是否有数据

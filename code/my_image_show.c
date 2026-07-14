@@ -1,4 +1,5 @@
 #include "my_image_show.h"
+#include "zf_driver_dma.h"
 
 static uint8  image_buf[MT9V03X_H][MT9V03X_W];                                 // 本地图像缓冲，防止 DMA 覆盖
 
@@ -113,40 +114,46 @@ static void find_lines (uint8 thresh)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-// 在 IPS200 上绘制巡线结果（逐点绘制）
+// 在 IPS200 上绘制巡线结果（逐点绘制，y 偏移至下半屏）
 //-------------------------------------------------------------------------------------------------------------------
+#define DRAW_OFFSET_Y   (MT9V03X_H)                                             // 巡线绘制在二值化图像区域，y 偏移一个图像高度
 static void draw_lines (void)
 {
     for(uint16 r = 0; r < MT9V03X_H; r++)
     {
         if(!edge_valid[r]) continue;
 
-        ips200_draw_point(left_edge[r],   r, RGB565_GREEN);                     // 左边界 — 绿色
-        ips200_draw_point(right_edge[r],  r, RGB565_BLUE);                     // 右边界 — 蓝色
-        ips200_draw_point(center_line[r], r, RGB565_RED);                      // 中线   — 红色
+        uint16 dy = r + DRAW_OFFSET_Y;
+        ips200_draw_point(left_edge[r],   dy, RGB565_BLUE);                    // 左边界 — 绿色
+        ips200_draw_point(right_edge[r],  dy, RGB565_BLUE);                    // 右边界 — 蓝色
+        ips200_draw_point(center_line[r], dy, RGB565_RED);                     // 中线   — 红色
     }
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-// 图像采集 + 大津法二值化 + 显示 + 巡线绘制
+// 图像采集 + 原始灰度显示 + 大津法二值化 + 二值化显示 + 巡线绘制
+// 布局：上半屏 = 原始灰度，下半屏 = 二值化图像 + 巡线
 //-------------------------------------------------------------------------------------------------------------------
 void image_show (void)
 {
     if(!mt9v03x_finish_flag) return;
 
-    // ① 拷贝到本地缓冲，防止 DMA 在新一帧写入时覆盖数据
+    // ① 临界区：关 DMA → 原子拷贝 → 释标志（思路2+3）
+    //    DMA 保持关闭，等下一帧 VSYNC 处理函数自动重开
+    dma_disable(MT9V03X_DMA_CH);
     memcpy(image_buf, mt9v03x_image, MT9V03X_IMAGE_SIZE);
-    mt9v03x_finish_flag = 0;                                                   // 提前释放标志，减少丢帧
+    mt9v03x_finish_flag = 0;
 
-    // ② 大津法求阈值
+    // ② 上半屏：显示原始灰度图像（threshold=0 不做二值化）
+    ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
+
+    // ③ 大津法求阈值
     uint8 thresh = otsu_threshold(image_buf);
 
-    // ③ 显示二值化图像（必须先于画线，避免线条被覆盖）
-    // 注意：不再调用 ips200_clear()，因为 ips200_show_gray_image 已通过 set_region 设定显示区域
-    //       并批量 SPI 连续写入，清屏 240×320 像素纯属浪费，是画面卡的元凶
-    ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
+    // ④ 下半屏：显示二值化图像（思路1：不调 ips200_clear，set_region 已覆盖目标区域）
+    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
 
-    // ④ 巡线 + 绘制边界和中线
+    // ⑤ 巡线 + 绘制边界和中线（绘制位置已偏移至下半屏）
     find_lines(thresh);
     draw_lines();
 }
