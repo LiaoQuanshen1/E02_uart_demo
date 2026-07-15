@@ -1,10 +1,10 @@
 #include "my_motor.h"
 
 // 引脚定义（来自推荐引脚分配：TIM5 2路PWM + 2路IO）
-#define MOTOR_A_DIR  A0                                                        // 电机A 方向
-#define MOTOR_A_PWM  TIM5_PWM_CH2_A1                                           // 电机A 速度 PWM
-#define MOTOR_B_DIR  A2                                                        // 电机B 方向
-#define MOTOR_B_PWM  TIM5_PWM_CH4_A3                                           // 电机B 速度 PWM
+#define MOTOR_A_DIR   A2                                                   // 电机A 方向
+#define MOTOR_A_PWM   TIM5_PWM_CH4_A3                                         // 电机A 速度 PWM
+#define MOTOR_B_DIR   A0                                                      // 电机B 方向
+#define MOTOR_B_PWM   TIM5_PWM_CH2_A1                                     // 电机B 速度 PWM
 #define PWM_FREQ     10000                                                     // PWM 频率 10kHz
 
 // 电机速度控制参数（百分制输入 → 内部 duty 值换算）
