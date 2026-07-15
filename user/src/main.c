@@ -42,7 +42,6 @@ static void menu_setup(void)
     Create_Menu_Number(&m_pid, &m_pid_kp, "Kp", &p_pid_kp, float_Box, 0.5f);
     Create_Menu_Number(&m_pid, &m_pid_ki, "Ki", &p_pid_ki, float_Box, 0.01f);
     Create_Menu_Number(&m_pid, &m_pid_kd, "Kd", &p_pid_kd, float_Box, 0.5f);
-    Create_Menu_Number(&head,  &m_speed,  "Speed", &p_speed, int_Box, 5);
 }
 
 int main(void) {
@@ -67,8 +66,8 @@ int main(void) {
   uart_write_byte(UART_INDEX, '\r');           // 输出回车
   uart_write_byte(UART_INDEX, '\n');           // 输出换行
   // 此处编写用户代码 例如外设初始化代码等
-  motor_b_set(10);
-  motor_a_set(10);
+  // motor_b_set(10);
+  // motor_a_set(10);
 
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
   menu_setup();   // 初始化菜单系统 + 创建演示参数
