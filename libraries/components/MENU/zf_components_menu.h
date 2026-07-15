@@ -41,6 +41,9 @@ typedef enum {
     MENU_EDITING,   /* 编辑模式：增减参数值     */
 } menu_state_t;
 
+/* 根节点（供外部创建菜单项时引用） */
+extern MENU_ITEM head;
+
 /* ---- 节点创建 ---- */
 void menu_init(void);
 void Create_Menu_Folder(MENU_ITEM *father, MENU_ITEM *me, const char name[]);

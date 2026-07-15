@@ -21,6 +21,30 @@ uint32 fifo_data_count = 0; // fifo 数据个数
 
 fifo_struct uart_data_fifo;
 
+/* ---- 菜单演示数据 ---- */
+static MENU_ITEM m_pid, m_pid_kp, m_pid_ki, m_pid_kd;
+static MENU_ITEM m_speed;
+
+static float    g_pid_kp  = 0.0f;
+static float    g_pid_ki  = 0.0f;
+static float    g_pid_kd  = 0.0f;
+static int      g_speed   = 50;
+
+static param_desc_t p_pid_kp  = { &g_pid_kp, float_Box, 0, 0.0f, 100.0f };
+static param_desc_t p_pid_ki  = { &g_pid_ki, float_Box, 0, 0.0f, 10.0f  };
+static param_desc_t p_pid_kd  = { &g_pid_kd, float_Box, 0, 0.0f, 50.0f  };
+static param_desc_t p_speed   = { &g_speed,  int_Box,   0, 0,     100    };
+
+static void menu_setup(void)
+{
+    menu_init();
+    Create_Menu_Folder(&head,  &m_pid,   "PID");
+    Create_Menu_Number(&m_pid, &m_pid_kp, "Kp", &p_pid_kp, float_Box, 0.5f);
+    Create_Menu_Number(&m_pid, &m_pid_ki, "Ki", &p_pid_ki, float_Box, 0.01f);
+    Create_Menu_Number(&m_pid, &m_pid_kd, "Kd", &p_pid_kd, float_Box, 0.5f);
+    Create_Menu_Number(&head,  &m_speed,  "Speed", &p_speed, int_Box, 5);
+}
+
 int main(void) {
   clock_init(SYSTEM_CLOCK_120M); // 初始化芯片时钟 工作频率为 120MHz
   debug_init();                  // 初始化默认 debug uart
@@ -47,7 +71,7 @@ int main(void) {
   motor_a_set(10);
 
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
-  menu_init();    // 初始化菜单系统
+  menu_setup();   // 初始化菜单系统 + 创建演示参数
 
   while (1) {
     image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线，全部封装在模块内
