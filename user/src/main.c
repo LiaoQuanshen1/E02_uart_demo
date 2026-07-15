@@ -1,6 +1,8 @@
 #include "my_image_show.h"
 #include "my_motor.h"
+#include "my_key.h"
 #include "zf_common_headfile.h"
+#include "zf_components_menu.h"
 
 #define UART_INDEX (DEBUG_UART_INDEX)       // 默认 UART_1
 #define UART_BAUDRATE (DEBUG_UART_BAUDRATE) // 默认 115200
@@ -44,8 +46,14 @@ int main(void) {
   motor_b_set(10);
   motor_a_set(10);
 
+  my_key_init();  // 初始化按键（E2/E3/E4/E5）
+  menu_init();    // 初始化菜单系统
+
   while (1) {
     image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线，全部封装在模块内
+
+    my_key_process(); // 按键扫描 + 菜单操作
+    menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
 
     // 此处编写需要循环执行的代码
     fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据

@@ -132,32 +132,28 @@ static void draw_lines (void)
 
 //-------------------------------------------------------------------------------------------------------------------
 // 图像采集 + 原始灰度显示 + 大津法二值化 + 二值化显示 + 巡线绘制
-// 布局：上半屏 = 原始灰度（120行），下半屏 = 二值化图像（80行，压缩显示）+ 巡线
-//       底部 40 行留给菜单
+// 布局：上半屏 = 原始灰度，下半屏 = 二值化图像 + 巡线
 //-------------------------------------------------------------------------------------------------------------------
 void image_show (void)
 {
     if(!mt9v03x_finish_flag) return;
 
-    // ① 临界区：关 DMA → 原子拷贝 → 释标志
+    // ① 临界区：关 DMA → 原子拷贝 → 释标志（思路2+3）
+    //    DMA 保持关闭，等下一帧 VSYNC 处理函数自动重开
     dma_disable(MT9V03X_DMA_CH);
     memcpy(image_buf, mt9v03x_image, MT9V03X_IMAGE_SIZE);
     mt9v03x_finish_flag = 0;
 
     // ② 上半屏：显示原始灰度图像（threshold=0 不做二值化）
-    ips200_show_gray_image(0, 0, (uint8 *)image_buf,
-                           MT9V03X_W, MT9V03X_H,
-                           MT9V03X_W, IMAGE_ORIGINAL_H, 0);
+    ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
 
     // ③ 大津法求阈值
     uint8 thresh = otsu_threshold(image_buf);
 
-    // ④ 下半屏：显示二值化图像（压缩至 IMAGE_BINARY_H 行高度）
-    ips200_show_gray_image(0, IMAGE_ORIGINAL_H, (uint8 *)image_buf,
-                           MT9V03X_W, MT9V03X_H,
-                           MT9V03X_W, IMAGE_BINARY_H, thresh);
+    // ④ 下半屏：显示二值化图像（思路1：不调 ips200_clear，set_region 已覆盖目标区域）
+    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
 
-    // ⑤ 巡线 + 绘制边界和中线（绘制位置偏移至下半屏，缩放匹配）
+    // ⑤ 巡线 + 绘制边界和中线（绘制位置已偏移至下半屏）
     find_lines(thresh);
     draw_lines();
 }

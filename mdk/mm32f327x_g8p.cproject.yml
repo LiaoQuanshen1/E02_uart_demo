@@ -74,6 +74,8 @@ project:
       files:
         - file: ../code/my_image_show.c
         - file: ../code/my_motor.c
+        - file: ../code/my_key.c
+        - file: ../code/my_key.h
     - group: zf_common
       files:
         - file: ../libraries/zf_common/zf_common_clock.c
@@ -243,3 +245,7 @@ project:
         - file: ../libraries/components/fatfs/source/ffconf.h
         - file: ../libraries/components/fatfs/source/ffsystem.c
         - file: ../libraries/components/fatfs/source/ffunicode.c
+    - group: components_menu
+      files:
+        - file: ../libraries/components/MENU/zf_components_menu.c
+        - file: ../libraries/components/MENU/zf_components_menu.h
