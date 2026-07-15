@@ -3,6 +3,13 @@
 
 #include "zf_common_headfile.h"
 
+/* ==================== 图像显示布局配置 ==================== */
+#define IMAGE_DISPLAY_BOTTOM_Y  200     /* 图像区域底部 Y 坐标，底部留给菜单   */
+#define IMAGE_ORIGINAL_H        MT9V03X_H  /* 原始图显示高度（上半屏 120 行） */
+
+/* 二值化图像显示高度 = 底部边界 - 原始图高度 */
+#define IMAGE_BINARY_H          (IMAGE_DISPLAY_BOTTOM_Y - IMAGE_ORIGINAL_H)
+
 //-------------------------------------------------------------------------------------------------------------------
 // 巡线结果数组 — 供控制算法引用
 // 注意：仅在 image_show() 调用后更新，edge_valid 为 0 的行数据无效
