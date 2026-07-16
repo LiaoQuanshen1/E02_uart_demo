@@ -439,6 +439,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\my_key.h</FilePath>
             </File>
+            <File>
+              <FileName>my_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\my_control.c</FilePath>
+            </File>
+            <File>
+              <FileName>my_control.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\my_control.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

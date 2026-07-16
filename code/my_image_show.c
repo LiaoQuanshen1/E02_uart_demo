@@ -54,7 +54,7 @@ uint8  edge_valid[MT9V03X_H];                                                  /
 // 巡线：从底部中间向两侧扫描，白-白-黑模式识别边界，中线迭代传递到上一行
 // 赛道白色（≥thresh），背景黑色（<thresh）
 //-------------------------------------------------------------------------------------------------------------------
-static void find_lines (uint8 thresh)
+static void find_lines_direct (uint8 thresh)
 {
     for(uint16 i = 0; i < MT9V03X_H; i++)                                      // 全部初始化为无效
     {
@@ -112,6 +112,10 @@ static void find_lines (uint8 thresh)
             start_x = center_line[r];
     }
 }
+static void find_lines_plant (uint8 thresh)
+{
+    
+}
 
 //-------------------------------------------------------------------------------------------------------------------
 // 在 IPS200 上绘制巡线结果（逐点绘制，y 偏移至下半屏）
@@ -154,7 +158,7 @@ void image_show (void)
     ips200_show_gray_image(0, MT9V03X_H, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
 
     // ⑤ 巡线 + 绘制边界和中线（绘制位置已偏移至下半屏）
-    find_lines(thresh);
+    find_lines_direct(thresh);
     draw_lines();
 }
 

@@ -47,7 +47,7 @@ extern MENU_ITEM head;
 /* ---- 节点创建 ---- */
 void menu_init(void);
 void Create_Menu_Folder(MENU_ITEM *father, MENU_ITEM *me, const char name[]);
-void Create_Menu_Number(MENU_ITEM *father, MENU_ITEM *me, const char name[], void *data, MENU_KIND kind, float step);
+void Create_Menu_Number(MENU_ITEM *father, MENU_ITEM *me, const char name[], void *data);
 
 /* ---- 菜单操作（供 my_key 调用）---- */
 menu_state_t menu_get_state(void);

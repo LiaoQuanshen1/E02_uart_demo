@@ -21,27 +21,33 @@ uint32 fifo_data_count = 0; // fifo 数据个数
 
 fifo_struct uart_data_fifo;
 
-/* ---- 菜单演示数据 ---- */
-static MENU_ITEM m_pid, m_pid_kp, m_pid_ki, m_pid_kd;
-static MENU_ITEM m_speed;
+// /* ---- 菜单演示数据 ---- */
+// static MENU_ITEM m_pid, m_pid_kp, m_pid_ki, m_pid_kd;
+// static MENU_ITEM m_speed;
 
-static float    g_pid_kp  = 0.0f;
-static float    g_pid_ki  = 0.0f;
-static float    g_pid_kd  = 0.0f;
-static int      g_speed   = 50;
+// static float    g_pid_kp  = 0.0f;
+// static float    g_pid_ki  = 0.0f;
+// static float    g_pid_kd  = 0.0f;
+// static int      g_speed   = 50;
 
-static param_desc_t p_pid_kp  = { &g_pid_kp, float_Box, 0, 0.0f, 100.0f };
-static param_desc_t p_pid_ki  = { &g_pid_ki, float_Box, 0, 0.0f, 10.0f  };
-static param_desc_t p_pid_kd  = { &g_pid_kd, float_Box, 0, 0.0f, 50.0f  };
-static param_desc_t p_speed   = { &g_speed,  int_Box,   0, 0,     100    };
+// static param_desc_t p_pid_kp  = { &g_pid_kp, float_Box, 0, 0.0f, 100.0f };
+// static param_desc_t p_pid_ki  = { &g_pid_ki, float_Box, 0, 0.0f, 10.0f  };
+// static param_desc_t p_pid_kd  = { &g_pid_kd, float_Box, 0, 0.0f, 50.0f  };
+// static param_desc_t p_speed   = { &g_speed,  int_Box,   0, 0,     100    };
+static int g_speed = 0,g_count = 0;
+static float g_ajust = 0.0f;
+static MENU_ITEM m_speed, m_ajust, m_count;
+
+static param_desc_t p_speed = { &g_speed, int_Box, 5, -100, 100 };
+static param_desc_t p_ajust = { &g_ajust, float_Box, 0.1, -10, 10 };
+static param_desc_t p_count = { &g_count, int_Box, 5, -100, 100 };
 
 static void menu_setup(void)
 {
     menu_init();
-    Create_Menu_Folder(&head,  &m_pid,   "PID");
-    Create_Menu_Number(&m_pid, &m_pid_kp, "Kp", &p_pid_kp, float_Box, 0.5f);
-    Create_Menu_Number(&m_pid, &m_pid_ki, "Ki", &p_pid_ki, float_Box, 0.01f);
-    Create_Menu_Number(&m_pid, &m_pid_kd, "Kd", &p_pid_kd, float_Box, 0.5f);
+    Create_Menu_Number(&head, &m_speed, "Speed", &p_speed);
+    Create_Menu_Number(&head, &m_ajust, "Ajust", &p_ajust);
+    Create_Menu_Number(&head, &m_count, "Count", &p_count);
 }
 
 int main(void) {
@@ -50,6 +56,7 @@ int main(void) {
 
   // 此处编写用户代码 例如外设初始化代码等
   motor_init(); // 初始化电机驱动模块
+ 
   fifo_init(&uart_data_fifo, FIFO_DATA_8BIT, uart_get_data,
             64); // 初始化 fifo 挂载缓冲区
   mt9v03x_init();
@@ -73,9 +80,11 @@ int main(void) {
   menu_setup();   // 初始化菜单系统 + 创建演示参数
 
   while (1) {
+    // 获取编码器计数值（仅用于清除编码器中断标志位）
     image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线，全部封装在模块内
-
     my_key_process(); // 按键扫描 + 菜单操作
+motor_a_set(g_speed); // 电机 A 速度设置
+motor_b_set(g_speed+g_ajust); // 电机 B 速度设置
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
 
     // 此处编写需要循环执行的代码

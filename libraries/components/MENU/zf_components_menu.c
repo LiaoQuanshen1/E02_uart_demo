@@ -87,11 +87,10 @@ void Create_Menu_Folder(MENU_ITEM *father, MENU_ITEM *me, const char name[])
     Create_Menu_Item(father, me, name, NULL, MENU_FOLDER);
 }
 
-void Create_Menu_Number(MENU_ITEM *father, MENU_ITEM *me, const char name[], void *data, MENU_KIND kind, float step)
+void Create_Menu_Number(MENU_ITEM *father, MENU_ITEM *me, const char name[], void *data)
 {
-    Create_Menu_Item(father, me, name, data, kind);
-    if(data != NULL)
-        ((param_desc_t *)data)->step = step;
+    param_desc_t *p = (param_desc_t *)data;
+    Create_Menu_Item(father, me, name, data, p->kind);
 }
 
 void menu_init(void)
