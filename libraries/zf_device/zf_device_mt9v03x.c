@@ -423,55 +423,71 @@ uint8 mt9v03x_init (void)
         mt9v03x_type = MT9V03X_SCCB;
         soft_iic_init(&mt9v03x_iic_struct, 0, MT9V03X_COF_IIC_DELAY, MT9V03X_COF_IIC_SCL, MT9V03X_COF_IIC_SDA);
         system_delay_ms(200);
-        if(mt9v03x_set_config_sccb(&mt9v03x_iic_struct, mt9v03x_set_confing_buffer))
+
+        // SCCB 重试机制：冷启动时 51 MCU 可能尚未完全就绪，重试提高成功率，ai添加
         {
-            mt9v03x_type = MT9V03X_UART;
-            set_camera_type(CAMERA_GRAYSCALE, mt9v03x_vsync_handler, mt9v03x_dma_handler, mt9v03x_uart_handler);
-            camera_fifo_init();
-
-            // 初始换串口 配置摄像头
-            uart_init(MT9V03X_COF_UART, MT9V03X_COF_BAUR, MT9V03X_COF_UART_RX, MT9V03X_COF_UART_TX);
-            uart_rx_interrupt(MT9V03X_COF_UART, 1);
-            system_delay_ms(200);
-
-            // 等待摄像头上电初始化成功 方式有两种：延时或者通过获取配置的方式 二选一
-            // system_delay_ms(1000);                                               // 延时方式
-
-            // if(mt9v03x_get_config(mt9v03x_get_confing_buffer))
-            // {
-            //     // 如果程序在输出了断言信息 并且提示出错位置在这里
-            //     // 那么就是串口通信出错并超时退出了
-            //     // 检查一下接线有没有问题 如果没问题可能就是坏了
-            //     zf_log(0, "MT9V03X get config error.");
-            //     set_camera_type(NO_CAMERE, NULL, NULL, NULL);
-            //     return_state = 1;
-            //     break;
-            // }
-            mt9v03x_version = mt9v03x_get_version();                                // 获取配置的方式
-
-            if(mt9v03x_set_config(mt9v03x_set_confing_buffer))
+            uint8 sccb_ok = 0;
+            uint8 sccb_retry = 3;
+            do
             {
-                // 如果程序在输出了断言信息 并且提示出错位置在这里
-                // 那么就是串口通信出错并超时退出了
-                // 检查一下接线有没有问题 如果没问题可能就是坏了
-                zf_log(0, "MT9V03X set config error.");
-                uart_rx_interrupt(MT9V03X_COF_UART, 0);
-                set_camera_type(NO_CAMERE, NULL, NULL, NULL);
-                return_state = 1;
-                break;
-            }
+                if(!mt9v03x_set_config_sccb(&mt9v03x_iic_struct, mt9v03x_set_confing_buffer))
+                {
+                    sccb_ok = 1;
+                    break;
+                }
+                system_delay_ms(300);
+            }while(--sccb_retry);
 
-            // 获取配置便于查看配置是否正确
-            if(mt9v03x_get_config(mt9v03x_get_confing_buffer))
+            if(!sccb_ok)
             {
-                // 如果程序在输出了断言信息 并且提示出错位置在这里
-                // 那么就是串口通信出错并超时退出了
-                // 检查一下接线有没有问题 如果没问题可能就是坏了
-                zf_log(0, "MT9V03X get config error.");
-                uart_rx_interrupt(MT9V03X_COF_UART, 0);
-                set_camera_type(NO_CAMERE, NULL, NULL, NULL);
-                return_state = 1;
-                break;
+                mt9v03x_type = MT9V03X_UART;
+                set_camera_type(CAMERA_GRAYSCALE, mt9v03x_vsync_handler, mt9v03x_dma_handler, mt9v03x_uart_handler);
+                camera_fifo_init();
+
+                // 初始换串口 配置摄像头
+                uart_init(MT9V03X_COF_UART, MT9V03X_COF_BAUR, MT9V03X_COF_UART_RX, MT9V03X_COF_UART_TX);
+                uart_rx_interrupt(MT9V03X_COF_UART, 1);
+                system_delay_ms(200);
+
+                // 等待摄像头上电初始化成功 方式有两种：延时或者通过获取配置的方式 二选一
+                system_delay_ms(1000);                                               // 延时方式
+
+                // if(mt9v03x_get_config(mt9v03x_get_confing_buffer))
+                // {
+                //     // 如果程序在输出了断言信息 并且提示出错位置在这里
+                //     // 那么就是串口通信出错并超时退出了
+                //     // 检查一下接线有没有问题 如果没问题可能就是坏了
+                //     zf_log(0, "MT9V03X get config error.");
+                //     set_camera_type(NO_CAMERE, NULL, NULL, NULL);
+                //     return_state = 1;
+                //     break;
+                // }
+                mt9v03x_version = mt9v03x_get_version();                                // 获取配置的方式
+
+                if(mt9v03x_set_config(mt9v03x_set_confing_buffer))
+                {
+                    // 如果程序在输出了断言信息 并且提示出错位置在这里
+                    // 那么就是串口通信出错并超时退出了
+                    // 检查一下接线有没有问题 如果没问题可能就是坏了
+                    zf_log(0, "MT9V03X set config error.");
+                    uart_rx_interrupt(MT9V03X_COF_UART, 0);
+                    set_camera_type(NO_CAMERE, NULL, NULL, NULL);
+                    return_state = 1;
+                    break;
+                }
+
+                // 获取配置便于查看配置是否正确
+                if(mt9v03x_get_config(mt9v03x_get_confing_buffer))
+                {
+                    // 如果程序在输出了断言信息 并且提示出错位置在这里
+                    // 那么就是串口通信出错并超时退出了
+                    // 检查一下接线有没有问题 如果没问题可能就是坏了
+                    zf_log(0, "MT9V03X get config error.");
+                    uart_rx_interrupt(MT9V03X_COF_UART, 0);
+                    set_camera_type(NO_CAMERE, NULL, NULL, NULL);
+                    return_state = 1;
+                    break;
+                }
             }
         }
 
