@@ -465,6 +465,8 @@ static void Buxian(GuaiPoint L_h, GuaiPoint L_l,
     int  bottom_row      = LINE_IMG_H - 1 - BUXIAN_BOTTOM_ROW_OFFSET;
     int  bottom_left_col = Left[bottom_row] - BUXIAN_BOTTOM_COL_OFFSET;
     int  bottom_right_col= Right[bottom_row] + BUXIAN_BOTTOM_COL_OFFSET;
+    if (bottom_left_col  < 0)            bottom_left_col  = 0;
+    if (bottom_right_col >= LINE_IMG_W)  bottom_right_col = LINE_IMG_W - 1;
     float k, b;
 
     // ---- 规则1: 四拐点全存在 ----
