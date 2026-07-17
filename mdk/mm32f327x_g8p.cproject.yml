@@ -76,6 +76,7 @@ project:
         - file: ../code/my_motor.c
         - file: ../code/my_key.c
         - file: ../code/my_key.h
+        - file: ../code/my_line_follow.c
     - group: zf_common
       files:
         - file: ../libraries/zf_common/zf_common_clock.c

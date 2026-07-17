@@ -449,6 +449,11 @@
               <FileType>5</FileType>
               <FilePath>.\my_control.h</FilePath>
             </File>
+            <File>
+              <FileName>my_line_follow.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\my_line_follow.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
