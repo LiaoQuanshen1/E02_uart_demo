@@ -192,6 +192,10 @@ static void FindImageTop(void)
     if (imgTop < 0) {
         imgTop = 0;
     }
+
+    // 将底行搜索结果存入数组，避免 FindSidelines 重复搜索底行
+    Left[bottom]  = l_side;
+    Right[bottom] = r_side;
 }
 
 // ============================================================
@@ -582,13 +586,13 @@ void ProcessFrame(uint8 otsu_threshold,
     // Step 2: 初始化全局数组
     InitImgInfo();
 
-    // Step 3: 画黑边
-    DrawFrameBorder();
-
-    // Step 4: 找截止行 + 最长白列
+    // Step 3: 找截止行 + 最长白列
     FindImageTop();
 
-    // Step 5: 逐行搜索左右边线
+    // Step 4: 画黑边（需在 FindImageTop 之后，使用正确的 imgTop）
+    DrawFrameBorder();
+
+    // Step 5: 逐行搜索左右边线（底行已在 FindImageTop 中搜索，从倒数第二行开始）
     FindSidelines(LINE_IMG_H - 1, imgTop + 1);
 
 #if ENABLE_GUAI_DETECTION
@@ -599,9 +603,11 @@ void ProcessFrame(uint8 otsu_threshold,
     // Step 6b: 补线（修改 Left/Right 数组）
     Buxian(L_h, L_l, R_h, R_l);
 
-    // 补线后重新搜索边线，使截止行和边线数据一致
+    // 补线后重算赛道宽度（不重跑 FindSidelines，避免覆盖补线结果）
     if (L_h.found || L_l.found || R_h.found || R_l.found) {
-        FindSidelines(LINE_IMG_H - 1, imgTop + 1);
+        for (int row = LINE_IMG_H - 1; row > imgTop; row--) {
+            WhiteWidth[row] = Right[row] - Left[row];
+        }
     }
 #endif
 
