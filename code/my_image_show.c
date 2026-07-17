@@ -1,4 +1,5 @@
 #include "my_image_show.h"
+#include "my_line_follow.h"
 #include "zf_driver_dma.h"
 
 static uint8  image_buf[MT9V03X_H][MT9V03X_W];                                 // 本地图像缓冲，防止 DMA 覆盖
@@ -45,92 +46,19 @@ static uint8 otsu_threshold (uint8 img[MT9V03X_H][MT9V03X_W])
     return best_t;
 }
 
-uint16 left_edge[MT9V03X_H];                                                   // 每行左边界 x 坐标
-uint16 right_edge[MT9V03X_H];                                                  // 每行右边界 x 坐标
-uint16 center_line[MT9V03X_H];                                                 // 每行中线   x 坐标
-uint8  edge_valid[MT9V03X_H];                                                  // 每行巡线是否有效
-
-//-------------------------------------------------------------------------------------------------------------------
-// 巡线：从底部中间向两侧扫描，白-白-黑模式识别边界，中线迭代传递到上一行
-// 赛道白色（≥thresh），背景黑色（<thresh）
-//-------------------------------------------------------------------------------------------------------------------
-static void find_lines_direct (uint8 thresh)
-{
-    for(uint16 i = 0; i < MT9V03X_H; i++)                                      // 全部初始化为无效
-    {
-        left_edge[i]  = 0xFFFF;
-        right_edge[i] = 0xFFFF;
-        edge_valid[i] = 0;
-    }
-
-    uint16 start_x = MT9V03X_W / 2;                                            // 底部起始：图像中间列
-
-    for(int16 r = MT9V03X_H - 1; r >= 0; r--)                                  // 从底部向上逐行扫描
-    {
-        if(image_buf[r][start_x] < thresh) break;                              // 起点不在赛道上，停止处理
-
-        uint16 left  = 0xFFFF;
-        uint16 right = 0xFFFF;
-
-        // 向左扫描：找 白-白-黑 组合 → 左边界为倒数第二个白点
-        for(int16 c = start_x; c >= 2; c--)
-        {
-            if(image_buf[r][c] >= thresh
-                    && image_buf[r][c - 1] >= thresh
-                    && image_buf[r][c - 2] < thresh)
-            {
-                left = (uint16)(c - 1);
-                break;
-            }
-        }
-        if(left == 0xFFFF) left = 0;                                            // 赛道延伸到图像左边缘
-
-        // 向右扫描：找 白-白-黑 组合 → 右边界为倒数第二个白点
-        for(uint16 c = start_x; c <= MT9V03X_W - 3; c++)
-        {
-            if(image_buf[r][c] >= thresh
-                    && image_buf[r][c + 1] >= thresh
-                    && image_buf[r][c + 2] < thresh)
-            {
-                right = (uint16)(c + 1);
-                break;
-            }
-        }
-        if(right == 0xFFFF) right = MT9V03X_W - 1;                              // 赛道延伸到图像右边缘
-
-        // 记录结果，中线作为上一行的扫描起点
-        if(left < right)
-        {
-            left_edge[r]   = left;
-            right_edge[r]  = right;
-            center_line[r] = (left + right) >> 1;
-            edge_valid[r]  = 1;
-        }
-        // 无论如何都更新 start_x，避免旧中线在新行误触 break
-        // 若本行无效，用上一次有效的中线继续向上传播
-        if(edge_valid[r])
-            start_x = center_line[r];
-    }
-}
-static void find_lines_plant (uint8 thresh)
-{
-    
-}
-
 //-------------------------------------------------------------------------------------------------------------------
 // 在 IPS200 上绘制巡线结果（逐点绘制，y 偏移至下半屏）
+// 数据来源：my_line_follow 模块的 Left/Right/Mid 全局数组
 //-------------------------------------------------------------------------------------------------------------------
 #define DRAW_OFFSET_Y   (MT9V03X_H)                                             // 巡线绘制在二值化图像区域，y 偏移一个图像高度
 static void draw_lines (void)
 {
-    for(uint16 r = 0; r < MT9V03X_H; r++)
+    for (int r = imgTop + 1; r < LINE_IMG_H; r++)
     {
-        if(!edge_valid[r]) continue;
-
-        uint16 dy = r + DRAW_OFFSET_Y;
-        ips200_draw_point(left_edge[r],   dy, RGB565_BLUE);                    // 左边界 — 绿色
-        ips200_draw_point(right_edge[r],  dy, RGB565_BLUE);                    // 右边界 — 蓝色
-        ips200_draw_point(center_line[r], dy, RGB565_RED);                     // 中线   — 红色
+        uint16 dy = (uint16)r + DRAW_OFFSET_Y;
+        ips200_draw_point((uint16)Left[r],  dy, RGB565_BLUE);                 // 左边界 — 蓝色
+        ips200_draw_point((uint16)Right[r], dy, RGB565_BLUE);                 // 右边界 — 蓝色
+        ips200_draw_point((uint16)Mid[r],   dy, RGB565_RED);                  // 中线   — 红色
     }
 }
 
@@ -154,11 +82,14 @@ void image_show (void)
     // ③ 大津法求阈值
     uint8 thresh = otsu_threshold(image_buf);
 
-    // ④ 下半屏：显示二值化图像（思路1：不调 ips200_clear，set_region 已覆盖目标区域）
-    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, thresh);
+    // ④ 运行完整巡线流水线（边缘补偿 + 二值化 + 边线搜索 + 拐点补线 + 中线 + 误差）
+    ProcessFrame(thresh, image_buf);
 
-    // ⑤ 巡线 + 绘制边界和中线（绘制位置已偏移至下半屏）
-    find_lines_direct(thresh);
+    // ⑤ 下半屏：显示边缘补偿后的二值化图像
+    //     line_binary 已是 0/255 二值，threshold=128 即可正确显示黑白
+    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)line_binary, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 128);
+
+    // ⑥ 绘制边界和中线（绘制位置已偏移至下半屏）
     draw_lines();
 }
 

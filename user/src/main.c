@@ -1,4 +1,5 @@
 #include "my_image_show.h"
+#include "my_line_follow.h"
 #include "my_motor.h"
 #include "my_key.h"
 #include "zf_common_headfile.h"
@@ -81,10 +82,22 @@ int main(void) {
 
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
-    image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线，全部封装在模块内
+    image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线流水线，全部封装在模块内
     my_key_process(); // 按键扫描 + 菜单操作
-motor_a_set(g_speed); // 电机 A 速度设置
-motor_b_set(g_speed+g_ajust); // 电机 B 速度设置
+
+    // ---- 电机控制（临时直驱，后续替换为 PID 控制）----
+    motor_a_set(g_speed); // 电机 A 速度设置
+    motor_b_set(g_speed+g_ajust); // 电机 B 速度设置
+
+    // TODO: 使用 Dir_err 进行转向 PID 控制
+    // Dir_err 由 ProcessFrame() 计算，定义在 my_line_follow.h
+    // Dir_err > 0 → 中线偏左 → 车应左转（差速：左轮减速/右轮加速）
+    // Dir_err < 0 → 中线偏右 → 车应右转（差速：左轮加速/右轮减速）
+    // 示例框架：
+    //   float steer = pid_steer_calculate(Dir_err);
+    //   motor_a_set(g_speed - (int16)steer);
+    //   motor_b_set(g_speed + (int16)steer);
+
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
 
     // 此处编写需要循环执行的代码
