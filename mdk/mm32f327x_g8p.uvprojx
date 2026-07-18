@@ -440,16 +440,6 @@
               <FilePath>..\code\my_key.h</FilePath>
             </File>
             <File>
-              <FileName>my_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\my_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>my_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\my_control.h</FilePath>
-            </File>
-            <File>
               <FileName>my_line_follow.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\code\my_line_follow.c</FilePath>
@@ -460,9 +450,9 @@
               <FilePath>..\code\my_position.c</FilePath>
             </File>
             <File>
-              <FileName>mu_position.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\code\mu_position.h</FilePath>
+              <FileName>my_control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\my_control.c</FilePath>
             </File>
           </Files>
         </Group>

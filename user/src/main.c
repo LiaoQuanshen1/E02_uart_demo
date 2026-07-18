@@ -2,6 +2,7 @@
 #include "my_line_follow.h"
 #include "my_motor.h"
 #include "my_key.h"
+#include "my_control.h"
 #include "zf_common_headfile.h"
 #include "zf_components_menu.h"
 
@@ -81,27 +82,18 @@ int main(void) {
 
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
   menu_setup();   // 初始化菜单系统 + 创建演示参数
+  control_init(); // 初始化 PID 控制器
 
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
     image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线流水线，全部封装在模块内
     my_key_process(); // 按键扫描 + 菜单操作
 
-    // ---- 电机控制（临时直驱，后续替换为 PID 控制）----
-    motor_a_set(g_speed); // 电机 A 速度设置
-    motor_b_set(g_speed*g_ajust); // 电机 B 速度设置
-
-    // TODO: 使用 Dir_err 进行转向 PID 控制
-    // Dir_err 由 ProcessFrame() 计算，定义在 my_line_follow.h
-    // Dir_err > 0 → 中线偏左 → 车应左转（差速：左轮减速/右轮加速）
-    // Dir_err < 0 → 中线偏右 → 车应右转（差速：左轮加速/右轮减速）
-    // 示例框架：
-    //   float steer = pid_steer_calculate(Dir_err);
-    //   motor_a_set(g_speed - (int16)steer);
-    //   motor_b_set(g_speed + (int16)steer);
+    // ---- 电机控制（位置式 PID 差速转向）----
 
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
-
+    
+    control_run(); // PID 控制器计算差速量并输出 PWM 到电机
     // 此处编写需要循环执行的代码
     fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据
     if (0 != fifo_data_count)                     // 读取到数据了
