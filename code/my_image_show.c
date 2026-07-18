@@ -51,15 +51,39 @@ static uint8 otsu_threshold (uint8 img[MT9V03X_H][MT9V03X_W])
 // 数据来源：my_line_follow 模块的 Left/Right/Mid 全局数组
 //-------------------------------------------------------------------------------------------------------------------
 #define DRAW_OFFSET_Y   (MT9V03X_H)                                             // 巡线绘制在二值化图像区域，y 偏移一个图像高度
+
+// 在 (x,y) 处绘制一个小十字标记
+static void draw_marker(uint16 x, uint16 y, uint16 color)
+{
+    ips200_draw_point(x,   y,   color);
+    ips200_draw_point(x-1, y,   color);
+    ips200_draw_point(x+1, y,   color);
+    ips200_draw_point(x,   y-1, color);
+    ips200_draw_point(x,   y+1, color);
+}
+
 static void draw_lines (void)
 {
+    uint16 dy;
+
+    // --- 绘制截止行（最远可见行）---
+    dy = (uint16)imgTop + DRAW_OFFSET_Y;
+    ips200_draw_line(0, dy, LINE_IMG_W - 1, dy, RGB565_CYAN);
+
+    // --- 绘制边线与中线 ---
     for (int r = imgTop + 1; r < LINE_IMG_H; r++)
     {
-        uint16 dy = (uint16)r + DRAW_OFFSET_Y;
+        dy = (uint16)r + DRAW_OFFSET_Y;
         ips200_draw_point((uint16)Left[r],  dy, RGB565_BLUE);                 // 左边界 — 蓝色
         ips200_draw_point((uint16)Right[r], dy, RGB565_BLUE);                 // 右边界 — 蓝色
         ips200_draw_point((uint16)Mid[r],   dy, RGB565_RED);                  // 中线   — 红色
     }
+
+    // --- 绘制拐点 ---
+    if (L_h.found) draw_marker((uint16)L_h.col, (uint16)L_h.row + DRAW_OFFSET_Y, RGB565_YELLOW);
+    if (L_l.found) draw_marker((uint16)L_l.col, (uint16)L_l.row + DRAW_OFFSET_Y, RGB565_GREEN);
+    if (R_h.found) draw_marker((uint16)R_h.col, (uint16)R_h.row + DRAW_OFFSET_Y, RGB565_PURPLE);
+    if (R_l.found) draw_marker((uint16)R_l.col, (uint16)R_l.row + DRAW_OFFSET_Y, RGB565_CYAN);
 }
 
 //-------------------------------------------------------------------------------------------------------------------

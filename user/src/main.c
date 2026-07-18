@@ -37,11 +37,12 @@ fifo_struct uart_data_fifo;
 // static param_desc_t p_speed   = { &g_speed,  int_Box,   0, 0,     100    };
 static int g_speed = 0,g_count = 0;
 static float g_ajust = 0.0f;
-static MENU_ITEM m_speed, m_ajust, m_count;
+static MENU_ITEM m_speed, m_ajust, m_count,m_error;
 
 static param_desc_t p_speed = { &g_speed, int_Box, 5, -100, 100 };
 static param_desc_t p_ajust = { &g_ajust, float_Box, 0.1, -10, 10 };
 static param_desc_t p_count = { &g_count, int_Box, 5, -100, 100 };
+static param_desc_t p_error = { &Dir_err, float_Box, 5, -100, 100 };//调摄像头
 
 static void menu_setup(void)
 {
@@ -49,6 +50,7 @@ static void menu_setup(void)
     Create_Menu_Number(&head, &m_speed, "Speed", &p_speed);
     Create_Menu_Number(&head, &m_ajust, "Ajust", &p_ajust);
     Create_Menu_Number(&head, &m_count, "Count", &p_count);
+    Create_Menu_Number(&head, &m_error, "Error", &p_error);
 }
 
 int main(void) {
