@@ -454,6 +454,16 @@
               <FileType>1</FileType>
               <FilePath>..\code\my_line_follow.c</FilePath>
             </File>
+            <File>
+              <FileName>my_position.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\my_position.c</FilePath>
+            </File>
+            <File>
+              <FileName>mu_position.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\mu_position.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
