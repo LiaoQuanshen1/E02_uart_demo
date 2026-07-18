@@ -52,14 +52,23 @@ static uint8 otsu_threshold (uint8 img[MT9V03X_H][MT9V03X_W])
 //-------------------------------------------------------------------------------------------------------------------
 #define DRAW_OFFSET_Y   (MT9V03X_H)                                             // 巡线绘制在二值化图像区域，y 偏移一个图像高度
 
-// 在 (x,y) 处绘制一个小十字标记
+// IPS200 竖屏分辨率（驱动内部 ips200_x_max=240, ips200_y_max=320）
+#define MARKER_X_MAX    240
+#define MARKER_Y_MAX    320
+
+// 在 (x,y) 处绘制一个小方块标记（带屏幕边界裁剪）
 static void draw_marker(uint16 x, uint16 y, uint16 color)
 {
-    ips200_draw_point(x,   y,   color);
-    ips200_draw_point(x-1, y,   color);
-    ips200_draw_point(x+1, y,   color);
-    ips200_draw_point(x,   y-1, color);
-    ips200_draw_point(x,   y+1, color);
+    int sx = (int)x, sy = (int)y;
+    for (int i = -3; i <= 3; i++) {
+        int px = sx + i;
+        if (px < 0 || px >= MARKER_X_MAX) continue;
+        for (int j = -3; j <= 3; j++) {
+            int py = sy + j;
+            if (py < 0 || py >= MARKER_Y_MAX) continue;
+            ips200_draw_point((uint16)px, (uint16)py, color);
+        }
+    }
 }
 
 static void draw_lines (void)

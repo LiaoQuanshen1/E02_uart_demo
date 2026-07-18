@@ -89,7 +89,7 @@ int main(void) {
 
     // ---- 电机控制（临时直驱，后续替换为 PID 控制）----
     motor_a_set(g_speed); // 电机 A 速度设置
-    motor_b_set(g_speed+g_ajust); // 电机 B 速度设置
+    motor_b_set(g_speed*g_ajust); // 电机 B 速度设置
 
     // TODO: 使用 Dir_err 进行转向 PID 控制
     // Dir_err 由 ProcessFrame() 计算，定义在 my_line_follow.h
