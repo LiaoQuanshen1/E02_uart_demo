@@ -19,9 +19,6 @@
  * 位置式 PID 公式：
  *   output(t) = Kp·e(t) + Ki·Σe(t) + Kd·[e(t) - e(t-1)]
  *
- * 使用方式：
- *   control_isr_handler() 由 TIM6 PIT 中断（80Hz = MT9V03X_FPS_DEF）调用，
- *   内部计时 + control_run()。主循环调用 timing_report() 定期输出耗时。
  */
 
 #include "my_control.h"
@@ -124,6 +121,8 @@ static float PID_Positional(PID_Controller *pid, float error)
 // ============================================================
 void control_run(void)
 {
+    
+
     // ------ Step 1: 获取方向误差 ------ 
     float error = Dir_err;   // 来自 my_line_follow.c，全局变量
 
@@ -142,64 +141,23 @@ void control_run(void)
     // Dir_err > 0（中线偏左）→ 需左转 → 右轮加速 / 左轮减速
     int16 left_speed  = (int16)((float)CTRL_BASE_SPEED - diff_pwm / 2.0f);
     int16 right_speed = (int16)(((float)CTRL_BASE_SPEED + diff_pwm / 2.0f)*CTRL_ADJUST);
-
+    // ------ Step 0: 丢线保护 —— 截止行靠近底部 → 立即停车 ------ 
+    // imgTop 越大可见越近，LINE_IMG_H-1=119 为图像最底行
+    if (imgTop > LINE_IMG_H - 10)                               // 最远可见行距底部不足 10 像素
+    {
+        motor_a_set(0);
+        motor_b_set(0);
+        return;
+    }
     // ------ Step 4: 输出 PWM 到电机 ------ 
     motor_a_set(left_speed);    // 左轮
     motor_b_set(right_speed);   // 右轮
+    
 }
 void control_test(void)
 {
     motor_a_set(CTRL_BASE_SPEED);
     motor_b_set((int16)(CTRL_BASE_SPEED*CTRL_ADJUST));
-}
-
-// ============================================================
-// ISR 耗时统计（由 control_isr_handler 写入，timing_report 读出）
-// ============================================================
-static isr_timing_t isr_tm = {0};
-
-// ============================================================
-// control_timing_init — 初始化 TIM6 PIT，频率 = MT9V03X_FPS_DEF (80Hz)
-// ============================================================
-void control_timing_init(void)
-{
-    pit_us_init(TIM6_PIT, 12500);                       // 12.5ms = 80Hz
-    interrupt_set_priority(TIM6_IRQn, 0);               // 优先级 0（最高，关键控制逻辑不可被抢占）
-    isr_tm.min_us = 0xFFFFFFFF;
-}
-
-// ============================================================
-// control_isr_handler — ISR 内调用：DWT 计时 + PID + 电机
-// ============================================================
-void control_isr_handler(void)
-{
-    uint32 t_start = DWT->CYCCNT;
-
-    control_run();
-
-    uint32 t_elapsed = DWT->CYCCNT - t_start;
-    uint32 us = t_elapsed / 120;                        // 120MHz → 周期→微秒
-
-    isr_tm.count++;
-    if (us > isr_tm.max_us) isr_tm.max_us = us;
-    if (us < isr_tm.min_us) isr_tm.min_us = us;
-    isr_tm.avg_us = (isr_tm.avg_us * 7 + us) / 8;      // 简单滑动平均
-}
-
-// ============================================================
-// timing_report — 主循环调用，每 100 帧串口输出耗时统计
-// ============================================================
-void timing_report(void)
-{
-    static uint32 last_count = 0;
-    if (isr_tm.count - last_count >= 100)
-    {
-        last_count = isr_tm.count;
-        char buf[64];
-        int len = sprintf(buf, "[CTRL] cnt=%lu avg=%luus max=%luus min=%luus\r\n",
-                          isr_tm.count, isr_tm.avg_us, isr_tm.max_us, isr_tm.min_us);
-        uart_write_buffer(DEBUG_UART_INDEX, (uint8 *)buf, len);
-    }
 }
 
 // ============================================================

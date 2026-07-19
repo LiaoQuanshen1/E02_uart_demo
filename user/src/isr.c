@@ -2,7 +2,36 @@
 #include "isr.h"
 #include "my_control.h"
 #include "my_image_show.h"
+#include "my_key.h"
 
+static isr_timing_t isr_tm = {0};
+
+// ============================================================
+// control_timing_init — 初始化 TIM6 PIT，频率 = MT9V03X_FPS_DEF (80Hz)
+// ============================================================
+void control_timing_init(void)
+{
+    isr_tm.min_us = 0xFFFFFFFF;                         // 必须在 pit_us_init 之前，防止 ISR 先触发导致 min=0
+    pit_us_init(TIM6_PIT, 12500);                       // 12.5ms = 80Hz
+    interrupt_set_priority(TIM6_IRQn, 0);               // 优先级 0（最高，关键控制逻辑不可被抢占）
+}
+
+
+// ============================================================
+// timing_report — 主循环调用，每 100 帧串口输出耗时统计
+// ============================================================
+void timing_report(void)
+{
+    static uint32 last_count = 0;
+    if (isr_tm.count - last_count >= 100)
+    {
+        last_count = isr_tm.count;
+        char buf[64];
+        int len = sprintf(buf, "[CTRL] cnt=%lu avg=%luus max=%luus min=%luus\r\n",
+                          isr_tm.count, isr_tm.avg_us, isr_tm.max_us, isr_tm.min_us);
+        uart_write_buffer(DEBUG_UART_INDEX, (uint8 *)buf, len);
+    }
+}
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM1 的定时器更新中断服务函数 启动 .s 文件定义 不允许修改函数名称
 //              默认优先级 修改优先级使用 interrupt_set_priority(TIM1_UP_IRQn, 1);
@@ -69,8 +98,17 @@ void TIM5_IRQHandler (void)
 //-------------------------------------------------------------------------------------------------------------------
 void TIM6_IRQHandler (void)
 {
+    uint32 t_start = DWT->CYCCNT;// 记录 TIM6中断用时，以后可能会用于调试优化
     image_handle();                                                             // 图像处理：拷贝 + Otsu + 巡线 → Dir_err
-    control_isr_handler();                                                      // DWT 计时 + PID + 电机输出
+    control_run();   
+     my_key_process(); // 按键扫描,如果影响了中断，需要删除 
+ uint32 t_elapsed = DWT->CYCCNT - t_start;
+    uint32 us = t_elapsed / 120;                        // 120MHz → 周期→微秒
+
+    isr_tm.count++;
+    if (us > isr_tm.max_us) isr_tm.max_us = us;
+    if (us < isr_tm.min_us) isr_tm.min_us = us;
+    isr_tm.avg_us = (isr_tm.avg_us * 7 + us) / 8;                                                  // DWT 计时 + PID + 电机输出
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }
 

@@ -63,7 +63,7 @@ int main(void) {
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
     image_show(); // IPS200 显示（灰度+二值化+巡线），图像处理已移至 TIM6 ISR
-    my_key_process(); // 按键扫描 + 菜单操作
+   
 
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
     

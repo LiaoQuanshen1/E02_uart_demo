@@ -41,8 +41,7 @@ typedef struct {
 // 公开 API
 // ============================================================
 void control_init(void);        // 初始化 PID 控制器 + DWT 周期计数器
-void control_isr_handler(void); // ISR 内调用：计时 + PID + 电机输出（80Hz，TIM6 中断触发）
-void control_run(void);         // 每帧/每控制周期调用一次，执行位置式 PID 并输出 PWM 差速
+void control_run(void);         // ISR 内调用（TIM6 80Hz），位置式 PID + PWM 电机差速输出
 void control_test(void);        // 直驱测试
 void menu_setup_ctrl(void);     // 创建控制参数菜单（由 main.c 的 menu_setup 调用）
 void control_timing_init(void); // 初始化 TIM6 PIT（80Hz）+ 启动中断
