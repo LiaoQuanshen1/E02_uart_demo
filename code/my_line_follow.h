@@ -22,6 +22,7 @@ extern int EDGE_COMP_THRESHOLD_DELTA;   // 边缘区域阈值降低量
 // 边线搜索（FindSidelines）
 // ============================================================
 extern int SIDELINE_TOLERANCE_COL;      // "白-黑-白" 容错模式：距上一行边线最大列偏差
+extern int SIDELINE_NEAR_RANGE;         // 邻近优先搜索：在上行边线 ±NEAR_RANGE 列内快速搜索
 
 // ============================================================
 // 动态前瞻行（CalculateError）

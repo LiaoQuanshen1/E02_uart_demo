@@ -20,8 +20,8 @@
  *   output(t) = Kp·e(t) + Ki·Σe(t) + Kd·[e(t) - e(t-1)]
  *
  * 使用方式：
- *   在主循环中（如 50Hz 定时中断），每帧调用一次 control_run()。
- *   调用前请确保 ProcessFrame() 已执行完毕，Dir_err 为最新值。
+ *   control_isr_handler() 由 TIM6 PIT 中断（80Hz = MT9V03X_FPS_DEF）调用，
+ *   内部计时 + control_run()。主循环调用 timing_report() 定期输出耗时。
  */
 
 #include "my_control.h"
@@ -29,6 +29,9 @@
 #include "my_motor.h"
 #include "my_position.h"
 #include "zf_components_menu.h"
+#include "zf_driver_pit.h"
+#include "zf_driver_uart.h"
+#include "stdio.h"
 
 // ============================================================
 // 可调参数 — 由菜单实时修改（初始值 = 原宏定义默认值）
@@ -47,7 +50,7 @@ float CTRL_ADJUST           = 0.7f;
 static PID_Controller pid_dir;
 
 // ============================================================
-// control_init — 初始化 PID 参数与状态
+// control_init — 初始化 PID 参数 + DWT 周期计数器
 // ============================================================
 void control_init(void)
 {
@@ -58,6 +61,11 @@ void control_init(void)
     pid_dir.last_error     = 0.0f;
     pid_dir.integral_limit = CTRL_INTEGRAL_LIMIT;
     pid_dir.output_limit   = CTRL_OUTPUT_LIMIT;
+
+    // 使能 DWT 周期计数器（用于 ISR 耗时测量）
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
 // ============================================================
@@ -143,6 +151,55 @@ void control_test(void)
 {
     motor_a_set(CTRL_BASE_SPEED);
     motor_b_set((int16)(CTRL_BASE_SPEED*CTRL_ADJUST));
+}
+
+// ============================================================
+// ISR 耗时统计（由 control_isr_handler 写入，timing_report 读出）
+// ============================================================
+static isr_timing_t isr_tm = {0};
+
+// ============================================================
+// control_timing_init — 初始化 TIM6 PIT，频率 = MT9V03X_FPS_DEF (80Hz)
+// ============================================================
+void control_timing_init(void)
+{
+    pit_us_init(TIM6_PIT, 12500);                       // 12.5ms = 80Hz
+    interrupt_set_priority(TIM6_IRQn, 3);               // 优先级 3（较低，不阻塞摄像头中断）
+    isr_tm.min_us = 0xFFFFFFFF;
+}
+
+// ============================================================
+// control_isr_handler — ISR 内调用：DWT 计时 + PID + 电机
+// ============================================================
+void control_isr_handler(void)
+{
+    uint32 t_start = DWT->CYCCNT;
+
+    control_run();
+
+    uint32 t_elapsed = DWT->CYCCNT - t_start;
+    uint32 us = t_elapsed / 120;                        // 120MHz → 周期→微秒
+
+    isr_tm.count++;
+    if (us > isr_tm.max_us) isr_tm.max_us = us;
+    if (us < isr_tm.min_us) isr_tm.min_us = us;
+    isr_tm.avg_us = (isr_tm.avg_us * 7 + us) / 8;      // 简单滑动平均
+}
+
+// ============================================================
+// timing_report — 主循环调用，每 100 帧串口输出耗时统计
+// ============================================================
+void timing_report(void)
+{
+    static uint32 last_count = 0;
+    if (isr_tm.count - last_count >= 100)
+    {
+        last_count = isr_tm.count;
+        char buf[64];
+        int len = sprintf(buf, "[CTRL] cnt=%lu avg=%luus max=%luus min=%luus\r\n",
+                          isr_tm.count, isr_tm.avg_us, isr_tm.max_us, isr_tm.min_us);
+        uart_write_buffer(DEBUG_UART_INDEX, (uint8 *)buf, len);
+    }
 }
 
 // ============================================================

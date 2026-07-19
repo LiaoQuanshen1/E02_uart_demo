@@ -28,6 +28,7 @@ int   EDGE_COMP_LEFT_BOUNDARY   = 36;
 int   EDGE_COMP_RIGHT_LOW       = 152;
 int   EDGE_COMP_THRESHOLD_DELTA = 10;
 int   SIDELINE_TOLERANCE_COL    = 6;
+int   SIDELINE_NEAR_RANGE       = 5;
 int   FORWARD_DEFAULT           = 50;
 int   FORWARD_MAX               = 100;
 int   FORWARD_SPEED_DIVISOR     = 30;
@@ -253,23 +254,44 @@ static void FindSidelines(int startRow, int endRow)
 
         // ========== 找左边线 ==========
         bool foundLeft = false;
-        for (int col = maxColumn; col > 1; col--) {
-            // 模式1：白-黑-黑（标准边线）
-            if (line_binary[row][col] == 255
-                && line_binary[row][col - 1] == 0
-                && line_binary[row][col - 2] == 0) {
-                Left[row]  = col;
-                foundLeft  = true;
-                break;
+
+        // --- 邻近优先：在上行边线 ±NEAR_RANGE 列内快速搜索 ---
+        {
+            int near_from = Left[row + 1] + SIDELINE_NEAR_RANGE;
+            int near_to   = Left[row + 1] - SIDELINE_NEAR_RANGE;
+            if (near_from > maxColumn) near_from = maxColumn;
+            if (near_to   < 1)         near_to   = 1;
+            for (int col = near_from; col >= near_to; col--) {
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col - 1] == 0
+                    && line_binary[row][col - 2] == 0) {
+                    Left[row]  = col;
+                    foundLeft  = true;
+                    break;
+                }
             }
-            // 模式2（容错）：白-黑-白，且距上一行边线在容差范围内
-            if (line_binary[row][col] == 255
-                && line_binary[row][col - 1] == 0
-                && line_binary[row][col - 2] == 255
-                && (col - Left[row + 1]) < SIDELINE_TOLERANCE_COL) {
-                Left[row]  = col;
-                foundLeft  = true;
-                break;
+        }
+
+        // --- 回退：未命中则从 maxColumn 全量扫描 ---
+        if (!foundLeft) {
+            for (int col = maxColumn; col > 1; col--) {
+                // 模式1：白-黑-黑（标准边线）
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col - 1] == 0
+                    && line_binary[row][col - 2] == 0) {
+                    Left[row]  = col;
+                    foundLeft  = true;
+                    break;
+                }
+                // 模式2（容错）：白-黑-白，且距上一行边线在容差范围内
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col - 1] == 0
+                    && line_binary[row][col - 2] == 255
+                    && (col - Left[row + 1]) < SIDELINE_TOLERANCE_COL) {
+                    Left[row]  = col;
+                    foundLeft  = true;
+                    break;
+                }
             }
         }
         if (!foundLeft) {
@@ -279,23 +301,44 @@ static void FindSidelines(int startRow, int endRow)
 
         // ========== 找右边线 ==========
         bool foundRight = false;
-        for (int col = maxColumn; col < LINE_IMG_W - 2; col++) {
-            // 模式1：白-黑-黑（标准边线）
-            if (line_binary[row][col] == 255
-                && line_binary[row][col + 1] == 0
-                && line_binary[row][col + 2] == 0) {
-                Right[row]  = col;
-                foundRight  = true;
-                break;
+
+        // --- 邻近优先：在上行边线 ±NEAR_RANGE 列内快速搜索 ---
+        {
+            int near_from = Right[row + 1] - SIDELINE_NEAR_RANGE;
+            int near_to   = Right[row + 1] + SIDELINE_NEAR_RANGE;
+            if (near_from < maxColumn)          near_from = maxColumn;
+            if (near_to   > LINE_IMG_W - 2)     near_to   = LINE_IMG_W - 2;
+            for (int col = near_from; col <= near_to; col++) {
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col + 1] == 0
+                    && line_binary[row][col + 2] == 0) {
+                    Right[row]  = col;
+                    foundRight  = true;
+                    break;
+                }
             }
-            // 模式2（容错）：白-黑-白，且距上一行边线在容差范围内
-            if (line_binary[row][col] == 255
-                && line_binary[row][col + 1] == 0
-                && line_binary[row][col + 2] == 255
-                && (Right[row + 1] - col) < SIDELINE_TOLERANCE_COL) {
-                Right[row]  = col;
-                foundRight  = true;
-                break;
+        }
+
+        // --- 回退：未命中则从 maxColumn 全量扫描 ---
+        if (!foundRight) {
+            for (int col = maxColumn; col < LINE_IMG_W - 2; col++) {
+                // 模式1：白-黑-黑（标准边线）
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col + 1] == 0
+                    && line_binary[row][col + 2] == 0) {
+                    Right[row]  = col;
+                    foundRight  = true;
+                    break;
+                }
+                // 模式2（容错）：白-黑-白，且距上一行边线在容差范围内
+                if (line_binary[row][col] == 255
+                    && line_binary[row][col + 1] == 0
+                    && line_binary[row][col + 2] == 255
+                    && (Right[row + 1] - col) < SIDELINE_TOLERANCE_COL) {
+                    Right[row]  = col;
+                    foundRight  = true;
+                    break;
+                }
             }
         }
         if (!foundRight) {
@@ -687,7 +730,7 @@ static MENU_ITEM m_lf_root, m_lf_edge, m_lf_side, m_lf_fwd, m_lf_err, m_lf_guai,
 
 // ---- 菜单项节点 ----
 static MENU_ITEM m_lf_edge_thr_min,  m_lf_edge_left_b,  m_lf_edge_right_l, m_lf_edge_thr_del;
-static MENU_ITEM m_lf_side_toler;
+static MENU_ITEM m_lf_side_near,    m_lf_side_toler;
 static MENU_ITEM m_lf_fwd_default,   m_lf_fwd_max,      m_lf_fwd_speed_div, m_lf_fwd_window;
 static MENU_ITEM m_lf_err_max,       m_lf_err_delta,     m_lf_err_mode,      m_lf_err_value;
 static MENU_ITEM m_lf_guai_width_up, m_lf_guai_width_dn, m_lf_guai_slope,   m_lf_guai_enable;
@@ -698,6 +741,7 @@ static param_desc_t p_edge_thr_min   = { &EDGE_COMP_THRESHOLD_MIN,   int_Box,   
 static param_desc_t p_edge_left_b    = { &EDGE_COMP_LEFT_BOUNDARY,   int_Box,   2,  10,   60 };
 static param_desc_t p_edge_right_l   = { &EDGE_COMP_RIGHT_LOW,       int_Box,   2, 130,  180 };
 static param_desc_t p_edge_thr_del   = { &EDGE_COMP_THRESHOLD_DELTA, int_Box,   1,   0,   30 };
+static param_desc_t p_side_near      = { &SIDELINE_NEAR_RANGE,       int_Box,   1,   2,   15 };
 static param_desc_t p_side_toler     = { &SIDELINE_TOLERANCE_COL,    int_Box,   1,   2,   20 };
 static param_desc_t p_fwd_default    = { &FORWARD_DEFAULT,           int_Box,   5,  20,  100 };
 static param_desc_t p_fwd_max        = { &FORWARD_MAX,               int_Box,   5,  50,  120 };
@@ -728,6 +772,7 @@ void menu_setup_lf(void)
 
     // -- 边线搜索 --
     Create_Menu_Folder(&m_lf_root,   &m_lf_side,          "Sideline");
+    Create_Menu_Number(&m_lf_side,   &m_lf_side_near,     "NearRange", &p_side_near);
     Create_Menu_Number(&m_lf_side,   &m_lf_side_toler,    "Tolerance", &p_side_toler);
 
     // -- 动态前瞻 --

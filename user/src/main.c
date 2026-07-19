@@ -57,18 +57,17 @@ int main(void) {
 
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
   menu_setup();   // 初始化菜单系统 + 创建演示参数
-  control_init(); // 初始化 PID 控制器
+  control_init(); // 初始化 PID 控制器 + DWT
+  control_timing_init(); // 启动 TIM6 PIT 中断（80Hz），ISR 内执行 control_run()
 
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
     image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线流水线，全部封装在模块内
     my_key_process(); // 按键扫描 + 菜单操作
 
-    // ---- 电机控制（位置式 PID 差速转向）----
-
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
     
-    control_run(); // PID 控制器计算差速量并输出 PWM 到电机
+    timing_report();  // 每 100 帧串口输出 ISR 耗时统计
     // 此处编写需要循环执行的代码
     fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据
     if (0 != fifo_data_count)                     // 读取到数据了
