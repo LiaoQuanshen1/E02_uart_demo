@@ -13,50 +13,52 @@
 // 区域阈值补偿（ApplyEdgeCompensation）
 // 目的：镜头径向畸变导致边缘偏暗，对左右边缘区域降低二值化阈值
 // ============================================================
-#define EDGE_COMP_THRESHOLD_MIN     70    // Otsu 阈值下限（低于此值强制设为 70）
-#define EDGE_COMP_LEFT_BOUNDARY     36    // 左边缘补偿列范围 [0, 36]
-#define EDGE_COMP_RIGHT_LOW         152   // 右边缘补偿起始列（col >= 152）
-#define EDGE_COMP_THRESHOLD_DELTA   10    // 边缘区域阈值降低量
+extern int EDGE_COMP_THRESHOLD_MIN;     // Otsu 阈值下限（默认 70）
+extern int EDGE_COMP_LEFT_BOUNDARY;     // 左边缘补偿列范围 [0, 36]
+extern int EDGE_COMP_RIGHT_LOW;         // 右边缘补偿起始列（col >= 152）
+extern int EDGE_COMP_THRESHOLD_DELTA;   // 边缘区域阈值降低量
 
 // ============================================================
 // 边线搜索（FindSidelines）
 // ============================================================
-#define SIDELINE_TOLERANCE_COL      6     // "白-黑-白" 容错模式：距上一行边线最大列偏差
+extern int SIDELINE_TOLERANCE_COL;      // "白-黑-白" 容错模式：距上一行边线最大列偏差
 
 // ============================================================
 // 动态前瞻行（CalculateError）
 // forward = FORWARD_DEFAULT - (当前速度 / FORWARD_SPEED_DIVISOR)
 // 速度越快 forward 越小 → 看得越远
 // ============================================================
-#define FORWARD_DEFAULT             60    // 默认前瞻行号
-#define FORWARD_MAX                 100   // 前瞻行号上限
-#define FORWARD_SPEED_DIVISOR       30    // 速度除数
+extern int FORWARD_DEFAULT;             // 默认前瞻行号
+extern int FORWARD_MAX;                 // 前瞻行号上限
+extern int FORWARD_SPEED_DIVISOR;       // 速度除数
+extern int FORWARD_WINDOW;              // 滑动平均半窗宽（取 forward±WINDOW 的均值）
 
 // ============================================================
 // 误差计算（CalculateError）
 // Dir_err > 0 → 中线偏左 → 车应左转
 // Dir_err < 0 → 中线偏右 → 车应右转
 // ============================================================
-#define DIR_ERR_MAX                 94    // Dir_err 绝对值上限（≈半宽 LINE_IMG_W/2）
-#define DIR_ERR_DELTA_MAX           8.0f  // 帧间误差变化率上限（抗突变）
+extern int   DIR_ERR_MAX;               // Dir_err 绝对值上限（≈半宽 LINE_IMG_W/2）
+extern float DIR_ERR_DELTA_MAX;         // 帧间误差变化率上限（抗突变）
+extern int   ERROR_MODE;                // 0=窗口平均, 1=全图线性加权
 
 // ============================================================
 // 拐点检测（FindGuaidians）
 // ============================================================
-#define GUAI_WIDTH_INCREASE_UP      10    // 上拐点：赛道宽度增加阈值（列）
-#define GUAI_WIDTH_INCREASE_DOWN    20    // 下拐点：赛道宽度减小阈值（列）
-#define GUAI_SLOPE_LIMIT            1.0f  // 拐点边线斜率限幅
+extern int   GUAI_WIDTH_INCREASE_UP;    // 上拐点：赛道宽度增加阈值（列）
+extern int   GUAI_WIDTH_INCREASE_DOWN;  // 下拐点：赛道宽度减小阈值（列）
+extern float GUAI_SLOPE_LIMIT;          // 拐点边线斜率限幅
 
 // ============================================================
 // 补线（Buxian）底部参考点参数
 // ============================================================
-#define BUXIAN_BOTTOM_ROW_OFFSET    5     // 底部参考点距离底边的行偏移
-#define BUXIAN_BOTTOM_COL_OFFSET    6     // 底部参考点距离边线的列偏移
+extern int BUXIAN_BOTTOM_ROW_OFFSET;    // 底部参考点距离底边的行偏移
+extern int BUXIAN_BOTTOM_COL_OFFSET;    // 底部参考点距离边线的列偏移
 
 // ============================================================
 // 功能开关
 // ============================================================
-#define ENABLE_GUAI_DETECTION       1     // 1=启用拐点检测与补线，0=仅基本巡线
+extern int ENABLE_GUAI_DETECTION;       // 1=启用拐点检测与补线，0=仅基本巡线
 
 // ============================================================
 // 拐点结构体
@@ -104,5 +106,8 @@ extern uint8 line_binary[LINE_IMG_H][LINE_IMG_W];
 // otsu_threshold: 大津法计算出的全局最优阈值
 // gray_img:       原始灰度图像（不会被修改）
 void ProcessFrame(uint8 otsu_threshold, const uint8 gray_img[LINE_IMG_H][LINE_IMG_W]);
+
+// 创建巡线参数菜单（由 main.c 的 menu_setup 调用）
+void menu_setup_lf(void);
 
 #endif

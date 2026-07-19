@@ -22,36 +22,11 @@ uint8 get_data = 0;         // 接收数据变量
 uint32 fifo_data_count = 0; // fifo 数据个数
 
 fifo_struct uart_data_fifo;
-
-// /* ---- 菜单演示数据 ---- */
-// static MENU_ITEM m_pid, m_pid_kp, m_pid_ki, m_pid_kd;
-// static MENU_ITEM m_speed;
-
-// static float    g_pid_kp  = 0.0f;
-// static float    g_pid_ki  = 0.0f;
-// static float    g_pid_kd  = 0.0f;
-// static int      g_speed   = 50;
-
-// static param_desc_t p_pid_kp  = { &g_pid_kp, float_Box, 0, 0.0f, 100.0f };
-// static param_desc_t p_pid_ki  = { &g_pid_ki, float_Box, 0, 0.0f, 10.0f  };
-// static param_desc_t p_pid_kd  = { &g_pid_kd, float_Box, 0, 0.0f, 50.0f  };
-// static param_desc_t p_speed   = { &g_speed,  int_Box,   0, 0,     100    };
-static int g_speed = 0,g_count = 0;
-static float g_ajust = 0.0f;
-static MENU_ITEM m_speed, m_ajust, m_count,m_error;
-
-static param_desc_t p_speed = { &g_speed, int_Box, 5, -100, 100 };
-static param_desc_t p_ajust = { &g_ajust, float_Box, 0.1, -10, 10 };
-static param_desc_t p_count = { &g_count, int_Box, 5, -100, 100 };
-static param_desc_t p_error = { &Dir_err, float_Box, 5, -100, 100 };//调摄像头
-
 static void menu_setup(void)
 {
     menu_init();
-    Create_Menu_Number(&head, &m_speed, "Speed", &p_speed);
-    Create_Menu_Number(&head, &m_ajust, "Ajust", &p_ajust);
-    Create_Menu_Number(&head, &m_count, "Count", &p_count);
-    Create_Menu_Number(&head, &m_error, "Error", &p_error);
+    menu_setup_lf();    // 巡线参数菜单（定义于 my_line_follow.c）
+    menu_setup_ctrl();  // 控制参数菜单（定义于 my_control.c）
 }
 
 int main(void) {

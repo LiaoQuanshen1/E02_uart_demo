@@ -50,14 +50,14 @@ void my_key_process(void)
 
     /* ===== 编辑模式 ===== */
     case MENU_EDITING:
-        if(key_get_state(KEY_1) == KEY_SHORT_PRESS)     /* E2: 减小 */
+        if(key_get_state(KEY_1) == KEY_SHORT_PRESS)     /* E2: 增大 */
         {
-            menu_open();    /* menu_open 内部在 EDITING 态调用 menu_dec */
+            menu_inc();
             key_clear_state(KEY_1);
         }
-        if(key_get_state(KEY_2) == KEY_SHORT_PRESS)     /* E3: 增大 */
+        if(key_get_state(KEY_2) == KEY_SHORT_PRESS)     /* E3: 减小 */
         {
-            menu_back();    /* menu_back 内部在 EDITING 态调用 menu_inc */
+            menu_dec();
             key_clear_state(KEY_2);
         }
         if(key_get_state(KEY_3) == KEY_SHORT_PRESS)     /* E4: 确认→下一项 */

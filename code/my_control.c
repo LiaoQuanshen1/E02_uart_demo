@@ -28,6 +28,18 @@
 #include "my_line_follow.h"
 #include "my_motor.h"
 #include "my_position.h"
+#include "zf_components_menu.h"
+
+// ============================================================
+// 可调参数 — 由菜单实时修改（初始值 = 原宏定义默认值）
+// ============================================================
+float CTRL_KP               = 1.0f;
+float CTRL_KI               = 0.02f;
+float CTRL_KD               = 0.5f;
+float CTRL_INTEGRAL_LIMIT   = 30.0f;
+float CTRL_OUTPUT_LIMIT     = 100.0f;
+int   CTRL_BASE_SPEED       = 10;
+float CTRL_ADJUST           = 0.7f;
 
 // ============================================================
 // 全局 PID 控制器实例
@@ -107,6 +119,13 @@ void control_run(void)
     // ------ Step 1: 获取方向误差 ------ 
     float error = Dir_err;   // 来自 my_line_follow.c，全局变量
 
+    // ------ Step 1.5: 同步菜单修改的 PID 参数到运行时控制器 ------ 
+    pid_dir.Kp             = CTRL_KP;
+    pid_dir.Ki             = CTRL_KI;
+    pid_dir.Kd             = CTRL_KD;
+    pid_dir.integral_limit = CTRL_INTEGRAL_LIMIT;
+    pid_dir.output_limit   = CTRL_OUTPUT_LIMIT;
+
     // ------ Step 2: 位置式 PID 计算差速量 ------ 
     float diff_pwm = PID_Positional(&pid_dir, error);
 
@@ -114,9 +133,41 @@ void control_run(void)
     // 约定：motor_a = 左轮，motor_b = 右轮
     // Dir_err > 0（中线偏左）→ 需左转 → 右轮加速 / 左轮减速
     int16 left_speed  = (int16)((float)CTRL_BASE_SPEED - diff_pwm / 2.0f);
-    int16 right_speed = (int16)(((float)CTRL_BASE_SPEED + diff_pwm / 2.0f)*0.7);
+    int16 right_speed = (int16)(((float)CTRL_BASE_SPEED + diff_pwm / 2.0f)*CTRL_ADJUST);
 
     // ------ Step 4: 输出 PWM 到电机 ------ 
     motor_a_set(left_speed);    // 左轮
     motor_b_set(right_speed);   // 右轮
+}
+void control_test(void)
+{
+    motor_a_set(CTRL_BASE_SPEED);
+    motor_b_set((int16)(CTRL_BASE_SPEED*CTRL_ADJUST));
+}
+
+// ============================================================
+// 控制参数菜单（供 main.c 调用，参数集中于本模块管理）
+// ============================================================
+
+static MENU_ITEM m_ctrl_root;
+static MENU_ITEM m_ctrl_kp, m_ctrl_ki, m_ctrl_kd, m_ctrl_intlim, m_ctrl_outlim, m_ctrl_basespd, m_ctrl_adjust;
+
+static param_desc_t p_ctrl_kp       = { &CTRL_KP,             float_Box, 0.1f,  0.0f,  10.0f  };
+static param_desc_t p_ctrl_ki       = { &CTRL_KI,             float_Box, 0.01f, 0.0f,   1.0f  };
+static param_desc_t p_ctrl_kd       = { &CTRL_KD,             float_Box, 0.1f,  0.0f,   5.0f  };
+static param_desc_t p_ctrl_intlim   = { &CTRL_INTEGRAL_LIMIT, float_Box, 5.0f,  5.0f, 100.0f  };
+static param_desc_t p_ctrl_outlim   = { &CTRL_OUTPUT_LIMIT,   float_Box, 5.0f, 20.0f, 100.0f  };
+static param_desc_t p_ctrl_basespd  = { &CTRL_BASE_SPEED,     int_Box,   5,     0,    100     };
+static param_desc_t p_ctrl_adjust   = { &CTRL_ADJUST,         float_Box, 0.05f, 0.5f,   1.5f  };
+
+void menu_setup_ctrl(void)
+{
+    Create_Menu_Folder(&head,      &m_ctrl_root,    "Control");
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_kp,      "Kp",       &p_ctrl_kp);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_ki,      "Ki",       &p_ctrl_ki);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_kd,      "Kd",       &p_ctrl_kd);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_intlim,  "IntLim",   &p_ctrl_intlim);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_outlim,  "OutLim",   &p_ctrl_outlim);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_basespd, "BaseSpd",  &p_ctrl_basespd);
+    Create_Menu_Number(&m_ctrl_root, &m_ctrl_adjust,  "Adjust",   &p_ctrl_adjust);
 }

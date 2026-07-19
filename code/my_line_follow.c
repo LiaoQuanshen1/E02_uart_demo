@@ -18,6 +18,29 @@
  */
 
 #include "my_line_follow.h"
+#include "zf_components_menu.h"
+
+// ============================================================
+// 可调参数 — 由菜单实时修改（初始值 = 原宏定义默认值）
+// ============================================================
+int   EDGE_COMP_THRESHOLD_MIN   = 70;
+int   EDGE_COMP_LEFT_BOUNDARY   = 36;
+int   EDGE_COMP_RIGHT_LOW       = 152;
+int   EDGE_COMP_THRESHOLD_DELTA = 10;
+int   SIDELINE_TOLERANCE_COL    = 6;
+int   FORWARD_DEFAULT           = 50;
+int   FORWARD_MAX               = 100;
+int   FORWARD_SPEED_DIVISOR     = 30;
+int   FORWARD_WINDOW            = 2;
+int   DIR_ERR_MAX               = 94;
+float DIR_ERR_DELTA_MAX         = 5.0f;
+int   ERROR_MODE                = 1;
+int   GUAI_WIDTH_INCREASE_UP    = 10;
+int   GUAI_WIDTH_INCREASE_DOWN  = 20;
+float GUAI_SLOPE_LIMIT          = 1.0f;
+int   BUXIAN_BOTTOM_ROW_OFFSET  = 5;
+int   BUXIAN_BOTTOM_COL_OFFSET  = 6;
+int   ENABLE_GUAI_DETECTION     = 1;
 
 // ============================================================
 // 全局数组 — 每行边线/中线/宽度数据
@@ -304,7 +327,8 @@ static void FindMidline(void)
 //   Dir_err > 0 → 中线偏左 → 车应左转
 //   Dir_err < 0 → 中线偏右 → 车应右转
 //
-// 使用动态前瞻行：速度越快看得越远（forward 越小）。
+// 使用动态前瞻行 + 滑动平均：在 forward 行附近取 FORWARD_WINDOW
+// 半窗宽的均值，避免单行噪声干扰。
 // 误差做过限幅和帧间变化率限幅。
 // ============================================================
 static void CalculateError(void)
@@ -324,7 +348,30 @@ static void CalculateError(void)
     if (forward < imgTop + 1) forward = imgTop + 1;
     if (forward > FORWARD_MAX) forward = FORWARD_MAX;
 
-    Dir_err = Dir_Err[forward];
+    // ------ Step 2.5: 计算 Dir_err ------ 
+    if (ERROR_MODE == 0)
+    {
+        // 模式0: 窗口平均（forward ± FORWARD_WINDOW）
+        int ws = forward - FORWARD_WINDOW;
+        int we = forward + FORWARD_WINDOW;
+        if (ws < imgTop + 1) ws = imgTop + 1;
+        if (we > LINE_IMG_H - 2) we = LINE_IMG_H - 2;
+        float sum = 0.0f;
+        int   cnt = 0;
+        for (int r = ws; r <= we; r++) { sum += Dir_Err[r]; cnt++; }
+        Dir_err = (cnt > 0) ? (sum / (float)cnt) : Dir_Err[forward];
+    }
+    else
+    {
+        // 模式1: 全图线性加权（近处权重高，远处权重低）
+        float w_sum = 0.0f, val_sum = 0.0f;
+        for (int r = imgTop + 1; r < LINE_IMG_H - 1; r++) {
+            float w = (float)(r - imgTop);
+            w_sum   += w;
+            val_sum += w * Dir_Err[r];
+        }
+        Dir_err = (w_sum > 0.0f) ? (val_sum / w_sum) : Dir_Err[forward];
+    }
 
     // ------ Step 3: 误差限幅 ------
     if (Dir_err > DIR_ERR_MAX)  Dir_err = DIR_ERR_MAX;
@@ -494,90 +541,90 @@ static void Buxian(GuaiPoint L_h, GuaiPoint L_l,
         return;
     }
 
-    // ---- 规则2: 左上+左下+右上 ----
-    if (L_h.found && L_l.found && R_h.found) {
-        k = CalcSlope(L_h.row, L_h.col, L_l.row, L_l.col);
-        b = CalcIntercept(L_h.row, L_h.col, L_l.row, L_l.col);
-        for (int i = L_h.row; i <= L_l.row; i++) {
-            Left[i] = (int)(k * i + b);
-        }
-        k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        for (int i = R_h.row; i <= bottom_row; i++) {
-            Right[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则2: 左上+左下+右上 ----
+    // if (L_h.found && L_l.found && R_h.found) {
+    //     k = CalcSlope(L_h.row, L_h.col, L_l.row, L_l.col);
+    //     b = CalcIntercept(L_h.row, L_h.col, L_l.row, L_l.col);
+    //     for (int i = L_h.row; i <= L_l.row; i++) {
+    //         Left[i] = (int)(k * i + b);
+    //     }
+    //     k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     for (int i = R_h.row; i <= bottom_row; i++) {
+    //         Right[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则3: 右上+右下+左上 ----
-    if (R_h.found && R_l.found && L_h.found) {
-        k = CalcSlope(R_h.row, R_h.col, R_l.row, R_l.col);
-        b = CalcIntercept(R_h.row, R_h.col, R_l.row, R_l.col);
-        for (int i = R_h.row; i <= R_l.row; i++) {
-            Right[i] = (int)(k * i + b);
-        }
-        k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        for (int i = L_h.row; i <= bottom_row; i++) {
-            Left[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则3: 右上+右下+左上 ----
+    // if (R_h.found && R_l.found && L_h.found) {
+    //     k = CalcSlope(R_h.row, R_h.col, R_l.row, R_l.col);
+    //     b = CalcIntercept(R_h.row, R_h.col, R_l.row, R_l.col);
+    //     for (int i = R_h.row; i <= R_l.row; i++) {
+    //         Right[i] = (int)(k * i + b);
+    //     }
+    //     k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     for (int i = L_h.row; i <= bottom_row; i++) {
+    //         Left[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则4: 仅左上+右上（下有丢线）----
-    if (L_h.found && R_h.found && !L_l.found && !R_l.found) {
-        k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        for (int i = L_h.row; i <= bottom_row; i++) {
-            Left[i] = (int)(k * i + b);
-        }
-        k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        for (int i = R_h.row; i <= bottom_row; i++) {
-            Right[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则4: 仅左上+右上（下有丢线）----
+    // if (L_h.found && R_h.found && !L_l.found && !R_l.found) {
+    //     k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     for (int i = L_h.row; i <= bottom_row; i++) {
+    //         Left[i] = (int)(k * i + b);
+    //     }
+    //     k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     for (int i = R_h.row; i <= bottom_row; i++) {
+    //         Right[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则5: 仅左上+左下 ----
-    if (L_h.found && L_l.found && !R_h.found) {
-        k = CalcSlope(L_h.row, L_h.col, L_l.row, L_l.col);
-        b = CalcIntercept(L_h.row, L_h.col, L_l.row, L_l.col);
-        for (int i = L_h.row; i <= L_l.row; i++) {
-            Left[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则5: 仅左上+左下 ----
+    // if (L_h.found && L_l.found && !R_h.found) {
+    //     k = CalcSlope(L_h.row, L_h.col, L_l.row, L_l.col);
+    //     b = CalcIntercept(L_h.row, L_h.col, L_l.row, L_l.col);
+    //     for (int i = L_h.row; i <= L_l.row; i++) {
+    //         Left[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则6: 仅右上+右下 ----
-    if (R_h.found && R_l.found && !L_h.found) {
-        k = CalcSlope(R_h.row, R_h.col, R_l.row, R_l.col);
-        b = CalcIntercept(R_h.row, R_h.col, R_l.row, R_l.col);
-        for (int i = R_h.row; i <= R_l.row; i++) {
-            Right[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则6: 仅右上+右下 ----
+    // if (R_h.found && R_l.found && !L_h.found) {
+    //     k = CalcSlope(R_h.row, R_h.col, R_l.row, R_l.col);
+    //     b = CalcIntercept(R_h.row, R_h.col, R_l.row, R_l.col);
+    //     for (int i = R_h.row; i <= R_l.row; i++) {
+    //         Right[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则7: 仅左上（且双边丢线）----
-    if (L_h.found && !L_l.found && !R_h.found && !R_l.found) {
-        k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
-        for (int i = L_h.row; i <= bottom_row; i++) {
-            Left[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则7: 仅左上（且双边丢线）----
+    // if (L_h.found && !L_l.found && !R_h.found && !R_l.found) {
+    //     k = CalcSlope(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     b = CalcIntercept(L_h.row, L_h.col, bottom_row, bottom_left_col);
+    //     for (int i = L_h.row; i <= bottom_row; i++) {
+    //         Left[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 
-    // ---- 规则8: 仅右上（且双边丢线）----
-    if (R_h.found && !R_l.found && !L_h.found && !L_l.found) {
-        k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
-        for (int i = R_h.row; i <= bottom_row; i++) {
-            Right[i] = (int)(k * i + b);
-        }
-        return;
-    }
+    // // ---- 规则8: 仅右上（且双边丢线）----
+    // if (R_h.found && !R_l.found && !L_h.found && !L_l.found) {
+    //     k = CalcSlope(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     b = CalcIntercept(R_h.row, R_h.col, bottom_row, bottom_right_col);
+    //     for (int i = R_h.row; i <= bottom_row; i++) {
+    //         Right[i] = (int)(k * i + b);
+    //     }
+    //     return;
+    // }
 }
 
 // ============================================================
@@ -605,7 +652,8 @@ void ProcessFrame(uint8 otsu_threshold,
     // Step 5: 逐行搜索左右边线（底行已在 FindImageTop 中搜索，从倒数第二行开始）
     FindSidelines(LINE_IMG_H - 1, imgTop + 1);
 
-#if ENABLE_GUAI_DETECTION
+    if (ENABLE_GUAI_DETECTION)
+    {
     // Step 6a: 拐点检测
     FindGuaidians(&L_h, &L_l, &R_h, &R_l);
 
@@ -618,7 +666,7 @@ void ProcessFrame(uint8 otsu_threshold,
             WhiteWidth[row] = Right[row] - Left[row];
         }
     }
-#endif
+    }  // if (ENABLE_GUAI_DETECTION)
 
     // Step 7: 计算中线
     FindMidline();
@@ -628,4 +676,83 @@ void ProcessFrame(uint8 otsu_threshold,
 
     // 至此，Dir_err 已就绪，可传递给 PID 控制器
     // Dir_err > 0 → 左转，Dir_err < 0 → 右转
+}
+
+// ============================================================
+// 巡线参数菜单（供 main.c 调用，参数集中于本模块管理）
+// ============================================================
+
+// ---- 文件夹节点 ----
+static MENU_ITEM m_lf_root, m_lf_edge, m_lf_side, m_lf_fwd, m_lf_err, m_lf_guai, m_lf_bux;
+
+// ---- 菜单项节点 ----
+static MENU_ITEM m_lf_edge_thr_min,  m_lf_edge_left_b,  m_lf_edge_right_l, m_lf_edge_thr_del;
+static MENU_ITEM m_lf_side_toler;
+static MENU_ITEM m_lf_fwd_default,   m_lf_fwd_max,      m_lf_fwd_speed_div, m_lf_fwd_window;
+static MENU_ITEM m_lf_err_max,       m_lf_err_delta,     m_lf_err_mode,      m_lf_err_value;
+static MENU_ITEM m_lf_guai_width_up, m_lf_guai_width_dn, m_lf_guai_slope,   m_lf_guai_enable;
+static MENU_ITEM m_lf_bux_row_off,   m_lf_bux_col_off;
+
+// ---- 参数描述符 ----
+static param_desc_t p_edge_thr_min   = { &EDGE_COMP_THRESHOLD_MIN,   int_Box,   5,  40,  120 };
+static param_desc_t p_edge_left_b    = { &EDGE_COMP_LEFT_BOUNDARY,   int_Box,   2,  10,   60 };
+static param_desc_t p_edge_right_l   = { &EDGE_COMP_RIGHT_LOW,       int_Box,   2, 130,  180 };
+static param_desc_t p_edge_thr_del   = { &EDGE_COMP_THRESHOLD_DELTA, int_Box,   1,   0,   30 };
+static param_desc_t p_side_toler     = { &SIDELINE_TOLERANCE_COL,    int_Box,   1,   2,   20 };
+static param_desc_t p_fwd_default    = { &FORWARD_DEFAULT,           int_Box,   5,  20,  100 };
+static param_desc_t p_fwd_max        = { &FORWARD_MAX,               int_Box,   5,  50,  120 };
+static param_desc_t p_fwd_speed_div  = { &FORWARD_SPEED_DIVISOR,     int_Box,   5,  10,  100 };
+static param_desc_t p_fwd_window     = { &FORWARD_WINDOW,            int_Box,   1,   0,   10 };
+static param_desc_t p_err_max        = { &DIR_ERR_MAX,               int_Box,   5,  40,   94 };
+static param_desc_t p_err_delta      = { &DIR_ERR_DELTA_MAX,         float_Box, 0.5f, 1.0f, 20.0f };
+static param_desc_t p_err_mode       = { &ERROR_MODE,                int_Box,   1,   0,    1 };
+static param_desc_t p_err_value      = { &Dir_err,                   float_Box, 0.0f, -94.0f, 94.0f };
+static param_desc_t p_guai_width_up  = { &GUAI_WIDTH_INCREASE_UP,    int_Box,   1,   5,   30 };
+static param_desc_t p_guai_width_dn  = { &GUAI_WIDTH_INCREASE_DOWN,  int_Box,   1,  10,   40 };
+static param_desc_t p_guai_slope     = { &GUAI_SLOPE_LIMIT,          float_Box, 0.1f, 0.3f, 2.0f };
+static param_desc_t p_guai_enable    = { &ENABLE_GUAI_DETECTION,     int_Box,   1,   0,    1 };
+static param_desc_t p_bux_row_off    = { &BUXIAN_BOTTOM_ROW_OFFSET,  int_Box,   1,   2,   20 };
+static param_desc_t p_bux_col_off    = { &BUXIAN_BOTTOM_COL_OFFSET,  int_Box,   1,   2,   20 };
+
+// ---- 菜单构建 ----
+void menu_setup_lf(void)
+{
+    Create_Menu_Folder(&head,        &m_lf_root,          "LineFollow");
+
+    // -- 边缘补偿 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_edge,          "EdgeComp");
+    Create_Menu_Number(&m_lf_edge,   &m_lf_edge_thr_min,  "ThrMin",    &p_edge_thr_min);
+    Create_Menu_Number(&m_lf_edge,   &m_lf_edge_left_b,   "LeftBound", &p_edge_left_b);
+    Create_Menu_Number(&m_lf_edge,   &m_lf_edge_right_l,  "RightLow",  &p_edge_right_l);
+    Create_Menu_Number(&m_lf_edge,   &m_lf_edge_thr_del,  "ThrDelta",  &p_edge_thr_del);
+
+    // -- 边线搜索 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_side,          "Sideline");
+    Create_Menu_Number(&m_lf_side,   &m_lf_side_toler,    "Tolerance", &p_side_toler);
+
+    // -- 动态前瞻 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_fwd,           "Forward");
+    Create_Menu_Number(&m_lf_fwd,    &m_lf_fwd_default,   "Default",   &p_fwd_default);
+    Create_Menu_Number(&m_lf_fwd,    &m_lf_fwd_max,       "Max",       &p_fwd_max);
+    Create_Menu_Number(&m_lf_fwd,    &m_lf_fwd_speed_div, "SpeedDiv",  &p_fwd_speed_div);
+    Create_Menu_Number(&m_lf_fwd,    &m_lf_fwd_window,    "Window",    &p_fwd_window);
+
+    // -- 误差计算 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_err,           "Error");
+    Create_Menu_Number(&m_lf_err,    &m_lf_err_max,       "Max",       &p_err_max);
+    Create_Menu_Number(&m_lf_err,    &m_lf_err_delta,     "DeltaMax",  &p_err_delta);
+    Create_Menu_Number(&m_lf_err,    &m_lf_err_mode,      "Mode",      &p_err_mode);
+    Create_Menu_Number(&m_lf_err,    &m_lf_err_value,     "DirErr",    &p_err_value);
+
+    // -- 拐点检测 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_guai,          "Guai");
+    Create_Menu_Number(&m_lf_guai,   &m_lf_guai_width_up, "WidthUp",   &p_guai_width_up);
+    Create_Menu_Number(&m_lf_guai,   &m_lf_guai_width_dn, "WidthDown", &p_guai_width_dn);
+    Create_Menu_Number(&m_lf_guai,   &m_lf_guai_slope,    "SlopeLim",  &p_guai_slope);
+    Create_Menu_Number(&m_lf_guai,   &m_lf_guai_enable,   "Enable",    &p_guai_enable);
+
+    // -- 补线 --
+    Create_Menu_Folder(&m_lf_root,   &m_lf_bux,           "Buxian");
+    Create_Menu_Number(&m_lf_bux,    &m_lf_bux_row_off,   "RowOff",    &p_bux_row_off);
+    Create_Menu_Number(&m_lf_bux,    &m_lf_bux_col_off,   "ColOff",    &p_bux_col_off);
 }
