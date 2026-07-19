@@ -3,6 +3,7 @@
 #include "zf_driver_dma.h"
 
 static uint8  image_buf[MT9V03X_H][MT9V03X_W];                                 // 本地图像缓冲，防止 DMA 覆盖
+static vuint8 frame_processed_flag = 0;                                         // 一帧图像处理完成标志（ISR→主循环）
 
 //-------------------------------------------------------------------------------------------------------------------
 // 大津法（Otsu）计算最优二值化阈值
@@ -96,34 +97,44 @@ static void draw_lines (void)
 }
 
 //-------------------------------------------------------------------------------------------------------------------
-// 图像采集 + 原始灰度显示 + 大津法二值化 + 二值化显示 + 巡线绘制
-// 布局：上半屏 = 原始灰度，下半屏 = 二值化图像 + 巡线
+// image_handle — ISR 内调用（TIM6 80Hz）：图像拷贝 + Otsu + 巡线流水线
+// 产出：Dir_err（供 control_run 消费）、line_binary（供显示消费）
 //-------------------------------------------------------------------------------------------------------------------
-void image_show (void)
+void image_handle(void)
 {
     if(!mt9v03x_finish_flag) return;
 
-    // ① 临界区：关 DMA → 原子拷贝 → 释标志（思路2+3）
-    //    DMA 保持关闭，等下一帧 VSYNC 处理函数自动重开
+    // ① 关 DMA → 原子拷贝 → 释标志
     dma_disable(MT9V03X_DMA_CH);
     memcpy(image_buf, mt9v03x_image, MT9V03X_IMAGE_SIZE);
     mt9v03x_finish_flag = 0;
 
-    // ② 上半屏：显示原始灰度图像（threshold=0 不做二值化）
-    ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
-
-    // ③ 大津法求阈值
+    // ② 大津法求阈值
     uint8 thresh = otsu_threshold(image_buf);
 
-    // ④ 运行完整巡线流水线（边缘补偿 + 二值化 + 边线搜索 + 拐点补线 + 中线 + 误差）
+    // ③ 巡线流水线 → 更新 Dir_err / Left / Right / Mid 等全局变量
     ProcessFrame(thresh, image_buf);
 
-    // ⑤ 下半屏：显示边缘补偿后的二值化图像
-    //     line_binary 已是 0/255 二值，threshold=128 即可正确显示黑白
-    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)line_binary, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 128);
-
-    // ⑥ 绘制边界和中线（绘制位置已偏移至下半屏）
-    draw_lines();
+    // ④ 通知主循环：新一帧已就绪，可以刷新显示
+    frame_processed_flag = 1;
 }
 
+//-------------------------------------------------------------------------------------------------------------------
+// image_show — 主循环调用：仅 IPS200 显示（无图像处理）
+// 布局：上半屏 = 原始灰度，下半屏 = 二值化图像 + 巡线
+//-------------------------------------------------------------------------------------------------------------------
+void image_show (void)
+{
+    if(!frame_processed_flag) return;
 
+    // ① 上半屏：原始灰度
+    ips200_show_gray_image(0, 0, (uint8 *)image_buf, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 0);
+
+    // ② 下半屏：二值化图像
+    ips200_show_gray_image(0, MT9V03X_H, (uint8 *)line_binary, MT9V03X_W, MT9V03X_H, MT9V03X_W, MT9V03X_H, 128);
+
+    // ③ 绘制边界和中线
+    draw_lines();
+
+    frame_processed_flag = 0;
+}

@@ -164,7 +164,7 @@ static isr_timing_t isr_tm = {0};
 void control_timing_init(void)
 {
     pit_us_init(TIM6_PIT, 12500);                       // 12.5ms = 80Hz
-    interrupt_set_priority(TIM6_IRQn, 3);               // 优先级 3（较低，不阻塞摄像头中断）
+    interrupt_set_priority(TIM6_IRQn, 0);               // 优先级 0（最高，关键控制逻辑不可被抢占）
     isr_tm.min_us = 0xFFFFFFFF;
 }
 

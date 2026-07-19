@@ -58,11 +58,11 @@ int main(void) {
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
   menu_setup();   // 初始化菜单系统 + 创建演示参数
   control_init(); // 初始化 PID 控制器 + DWT
-  control_timing_init(); // 启动 TIM6 PIT 中断（80Hz），ISR 内执行 control_run()
+  control_timing_init(); // 启动 TIM6 PIT 中断（80Hz），ISR 内执行 image_handle + control_run
 
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
-    image_show(); // 图像采集 + 原始灰度 + 二值化 + 巡线流水线，全部封装在模块内
+    image_show(); // IPS200 显示（灰度+二值化+巡线），图像处理已移至 TIM6 ISR
     my_key_process(); // 按键扫描 + 菜单操作
 
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
