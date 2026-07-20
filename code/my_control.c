@@ -38,7 +38,7 @@ float CTRL_KI               = 0.02f;
 float CTRL_KD               = 0.5f;
 float CTRL_INTEGRAL_LIMIT   = 30.0f;
 float CTRL_OUTPUT_LIMIT     = 100.0f;
-int   CTRL_BASE_SPEED       = 10;
+int   CTRL_BASE_SPEED       = 15;
 float CTRL_ADJUST           = 0.7f;
 
 // ============================================================
