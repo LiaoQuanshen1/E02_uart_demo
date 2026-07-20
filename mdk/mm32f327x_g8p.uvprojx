@@ -754,6 +754,16 @@
               <FileType>1</FileType>
               <FilePath>..\libraries\components\fatfs\source\ffunicode.c</FilePath>
             </File>
+            <File>
+              <FileName>seekfree_assistant.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\components\seekfree_assistant\seekfree_assistant.c</FilePath>
+            </File>
+            <File>
+              <FileName>seekfree_assistant_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\components\seekfree_assistant\seekfree_assistant_interface.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

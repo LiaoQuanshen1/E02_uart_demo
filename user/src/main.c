@@ -67,7 +67,7 @@ int main(void) {
 
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
     
-    timing_report();  // 每 100 帧串口输出 ISR 耗时统计
+    //timing_report();  // 每 100 帧串口输出 ISR 耗时统计
     // 此处编写需要循环执行的代码
     fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据
     if (0 != fifo_data_count)                     // 读取到数据了

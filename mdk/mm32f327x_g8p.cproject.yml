@@ -251,3 +251,9 @@ project:
       files:
         - file: ../libraries/components/MENU/zf_components_menu.c
         - file: ../libraries/components/MENU/zf_components_menu.h
+    - group: components_seekfree_assistant
+      files:
+        - file: ../libraries/components/seekfree_assistant/seekfree_assistant.c
+        - file: ../libraries/components/seekfree_assistant/seekfree_assistant.h
+        - file: ../libraries/components/seekfree_assistant/seekfree_assistant_interface.c
+        - file: ../libraries/components/seekfree_assistant/seekfree_assistant_interface.h
