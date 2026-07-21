@@ -3,6 +3,7 @@
 #include "my_motor.h"
 #include "my_key.h"
 #include "my_control.h"
+#include "my_position.h"
 #include "zf_common_headfile.h"
 #include "zf_components_menu.h"
 
@@ -39,6 +40,7 @@ int main(void) {
   fifo_init(&uart_data_fifo, FIFO_DATA_8BIT, uart_get_data,
             64); // 初始化 fifo 挂载缓冲区
   mt9v03x_init();
+  imu660ra_init();//硬件spi
   ips200_init(IPS200_TYPE_SPI); // 初始化 IPS200（SPI 模式）
   ips200_clear();
 
@@ -66,18 +68,18 @@ int main(void) {
    
 
     menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
-    
+    printf("%f,%f\r\n", pitch_angle, roll_angle);
     //timing_report();  // 每 100 帧串口输出 ISR 耗时统计
     // 此处编写需要循环执行的代码
     fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据
     if (0 != fifo_data_count)                     // 读取到数据了
     {
-      fifo_read_buffer(
-          &uart_data_fifo, fifo_get_data, &fifo_data_count,
-          FIFO_READ_AND_CLEAN); // 将 fifo 中数据读出并清空 fifo 挂载的缓冲
-      uart_write_string(UART_INDEX, "\r\nUART get data:"); // 输出测试信息
-      uart_write_buffer(UART_INDEX, fifo_get_data,
-                        fifo_data_count); // 将读取到的数据发送出去
+      //fifo_read_buffer(
+        //  &uart_data_fifo, fifo_get_data, &fifo_data_count,
+          //FIFO_READ_AND_CLEAN); // 将 fifo 中数据读出并清空 fifo 挂载的缓冲
+      //uart_write_string(UART_INDEX, "\r\nUART get data:"); // 输出测试信息
+      //uart_write_buffer(UART_INDEX, fifo_get_data,
+        //                fifo_data_count); // 将读取到的数据发送出去
     }
     // 此处编写需要循环执行的代码
   }

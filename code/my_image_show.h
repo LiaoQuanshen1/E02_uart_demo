@@ -1,6 +1,6 @@
 #ifndef _my_image_show_h_
 #define _my_image_show_h_
-#define IMAGE_SHOW_UART
+//#define IMAGE_SHOW_UART
 #include "zf_common_headfile.h"
 
 //-------------------------------------------------------------------------------------------------------------------
