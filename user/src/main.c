@@ -1,11 +1,12 @@
+#include "my_control.h"
 #include "my_image_show.h"
+#include "my_key.h"
 #include "my_line_follow.h"
 #include "my_motor.h"
-#include "my_key.h"
-#include "my_control.h"
 #include "my_position.h"
 #include "zf_common_headfile.h"
 #include "zf_components_menu.h"
+
 
 #define UART_INDEX (DEBUG_UART_INDEX)       // 默认 UART_1
 #define UART_BAUDRATE (DEBUG_UART_BAUDRATE) // 默认 115200
@@ -23,11 +24,10 @@ uint8 get_data = 0;         // 接收数据变量
 uint32 fifo_data_count = 0; // fifo 数据个数
 
 fifo_struct uart_data_fifo;
-static void menu_setup(void)
-{
-    menu_init();
-    menu_setup_lf();    // 巡线参数菜单（定义于 my_line_follow.c）
-    menu_setup_ctrl();  // 控制参数菜单（定义于 my_control.c）
+static void menu_setup(void) {
+  menu_init();
+  menu_setup_lf();   // 巡线参数菜单（定义于 my_line_follow.c）
+  menu_setup_ctrl(); // 控制参数菜单（定义于 my_control.c）
 }
 
 int main(void) {
@@ -36,11 +36,14 @@ int main(void) {
 
   // 此处编写用户代码 例如外设初始化代码等
   motor_init(); // 初始化电机驱动模块
- 
+
   fifo_init(&uart_data_fifo, FIFO_DATA_8BIT, uart_get_data,
             64); // 初始化 fifo 挂载缓冲区
   mt9v03x_init();
-  imu660ra_init();//硬件spi
+  while (imu660ra_init()) {
+    system_delay_ms(20);
+    printf("IMU660RA initialization failed.\r\n");
+  } // 失败则重试
   ips200_init(IPS200_TYPE_SPI); // 初始化 IPS200（SPI 模式）
   ips200_clear();
 
@@ -50,38 +53,22 @@ int main(void) {
   interrupt_set_priority(UART_PRIORITY,
                          0); // 设置对应 UART_INDEX 的中断优先级为 0
 
-  uart_write_string(UART_INDEX, "UART Text."); // 输出测试信息
-  uart_write_byte(UART_INDEX, '\r');           // 输出回车
-  uart_write_byte(UART_INDEX, '\n');           // 输出换行
-  // 此处编写用户代码 例如外设初始化代码等
-  // motor_b_set(10);
-  // motor_a_set(10);
 
   my_key_init();  // 初始化按键（E2/E3/E4/E5）
   menu_setup();   // 初始化菜单系统 + 创建演示参数
   control_init(); // 初始化 PID 控制器 + DWT
-  control_timing_init(); // 启动 TIM6 PIT 中断（80Hz），ISR 内执行 image_handle + control_run
+  control_timing_init(); // 启动 TIM6 PIT 中断（80Hz），ISR 内执行 image_handle
+                         // + control_run
 
   while (1) {
     // 获取编码器计数值（仅用于清除编码器中断标志位）
     image_show(); // IPS200 显示（灰度+二值化+巡线），图像处理已移至 TIM6 ISR
-   
 
-    menu_display();   // 菜单绘制（仅在菜单打开时绘制底部区域）
-    printf("%f,%f\r\n", pitch_angle, roll_angle);
-    //timing_report();  // 每 100 帧串口输出 ISR 耗时统计
-    // 此处编写需要循环执行的代码
-    fifo_data_count = fifo_used(&uart_data_fifo); // 查看 fifo 是否有数据
-    if (0 != fifo_data_count)                     // 读取到数据了
-    {
-      //fifo_read_buffer(
-        //  &uart_data_fifo, fifo_get_data, &fifo_data_count,
-          //FIFO_READ_AND_CLEAN); // 将 fifo 中数据读出并清空 fifo 挂载的缓冲
-      //uart_write_string(UART_INDEX, "\r\nUART get data:"); // 输出测试信息
-      //uart_write_buffer(UART_INDEX, fifo_get_data,
-        //                fifo_data_count); // 将读取到的数据发送出去
-    }
-    // 此处编写需要循环执行的代码
+    menu_display(); // 菜单绘制（仅在菜单打开时绘制底部区域）
+    my_position_update(); // 更新姿态角 pitch_angle/roll_angle
+    printf("%f,%f,%f,%f,%f\r\n", imu660ra_acc_transition(imu660ra_acc_x), imu660ra_acc_transition(imu660ra_acc_y), imu660ra_acc_transition(imu660ra_acc_z), pitch_angle, roll_angle);
+    // timing_report();  // 每 100 帧串口输出 ISR 耗时统计
+
   }
 }
 

@@ -15,8 +15,8 @@ void my_position_update(void)
     float gx = imu660ra_gyro_transition(imu660ra_gyro_x);
     float gy = imu660ra_gyro_transition(imu660ra_gyro_y);
 
-    float acc_pitch = atan2f(ax, az) * 57.29578f;
-    float acc_roll  = atan2f(ay, az) * 57.29578f;
+    float acc_pitch = atan2f(ax, ay) * 57.29578f;//?????
+    float acc_roll  = atan2f(ax, az) * 57.29578f;//?????
 
     // 互补滤波：α=0.96 信任陀螺仪，dt=0.02(50Hz主循环)
     pitch_angle = 0.96f * (pitch_angle + gy * 0.02f) + 0.04f * acc_pitch;
